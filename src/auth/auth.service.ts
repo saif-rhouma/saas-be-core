@@ -2,21 +2,24 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { scrypt as _scrypt, randomBytes } from 'crypto';
 import { promisify } from 'util';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { TokenService } from './token.service';
 
 const scrypt = promisify(_scrypt);
 
 @Injectable()
 export class AuthService {
   constructor(
+    private tokenService: TokenService,
     private usersService: UsersService,
     private jwtService: JwtService,
+    private config: ConfigService,
   ) {}
 
   async signup(email: string, password: string) {
@@ -52,12 +55,44 @@ export class AuthService {
       // throw new BadRequestException('bad password');
       throw new UnauthorizedException('Wrong credentials');
     }
-
-    return this.generateUserTokens(user.id);
+    const { accessToken, refreshToken } = await this.generateUserTokens(user);
+    await this.storeRefreshToken(refreshToken, user);
+    return { ...user, accessToken, refreshToken };
   }
 
-  async generateUserTokens(userId) {
-    const accessToken = this.jwtService.sign({ userId }, { expiresIn: '1h' });
+  async logout(refreshToken: string) {
+    return this.tokenService.remove(refreshToken);
+  }
+
+  async generateUserTokens(user) {
+    const accessToken = this.jwtService.sign({ user }, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(
+      { user },
+      { secret: this.config.get<string>('REFRESH_TOKEN_SECRET') },
+    );
+    return { accessToken, refreshToken };
+  }
+
+  async refreshTokens(refreshToken: string) {
+    if (refreshToken == null) {
+      throw new UnauthorizedException();
+    }
+    const token = await this.tokenService.findOne(refreshToken);
+
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+    const { user } = await this.jwtService.verify(refreshToken, {
+      secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
+    });
+
+    const { accessToken } = await this.generateUserTokens(user);
     return { accessToken };
+  }
+
+  async storeRefreshToken(refreshToken, user) {
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 3);
+    this.tokenService.create(refreshToken, user, expiryDate);
   }
 }

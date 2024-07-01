@@ -1,11 +1,14 @@
+/* eslint-disable prettier/prettier */
 import {
   AfterInsert,
   AfterRemove,
   AfterUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { RefreshToken } from '../../auth/entities/token.entity';
 
 @Entity()
 export class User {
@@ -15,9 +18,11 @@ export class User {
   @Column()
   email: string;
 
-  // @Exclude()
   @Column()
   password: string;
+
+  @OneToMany(() => RefreshToken, (token) => token.user)
+  tokens: RefreshToken[];
 
   @AfterInsert()
   logInsert() {
