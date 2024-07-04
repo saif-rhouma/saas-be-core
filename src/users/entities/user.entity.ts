@@ -4,11 +4,17 @@ import {
   AfterRemove,
   AfterUpdate,
   Column,
+  CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { RefreshToken } from '../../auth/entities/token.entity';
+import { Role } from './role.entity';
+import { Permission } from './permission.entity';
 
 @Entity()
 export class User {
@@ -20,6 +26,19 @@ export class User {
 
   @Column()
   password: string;
+
+  @CreateDateColumn()
+  createTime: Date;
+
+  @UpdateDateColumn()
+  updateTime: Date;
+
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable()
+  roles: Role[];
+
+  @ManyToMany(() => Permission, (permission) => permission.users)
+  permissions: Permission[];
 
   @OneToMany(() => RefreshToken, (token) => token.user)
   tokens: RefreshToken[];

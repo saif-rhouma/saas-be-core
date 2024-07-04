@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Expose, Transform } from 'class-transformer';
-export class UserDto {
+
+export class UserTokenDto {
   @Expose()
   id: number;
 
@@ -8,8 +9,7 @@ export class UserDto {
   email: string;
 
   @Expose()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @Transform(({ value, obj }) => obj.roles.map((role) => role.name))
+  @Transform(({ value }) => value.map((role) => role.name))
   roles: string[];
 
   @Expose()
