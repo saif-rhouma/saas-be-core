@@ -1,10 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
@@ -17,26 +12,19 @@ export class AuthenticationGuard implements CanActivate {
     private config: ConfigService,
   ) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     try {
       const request = context.switchToHttp().getRequest();
       const token = request.headers.authorization.split(' ')[1];
       if (!token) {
-        throw new UnauthorizedException(
-          MSG_EXCEPTION.UNAUTHORIZED_TOKEN_NOT_FOUND,
-        );
+        throw new UnauthorizedException(MSG_EXCEPTION.UNAUTHORIZED_TOKEN_NOT_FOUND);
       }
       const { user } = this.jwtService.verify(token, {
         secret: this.config.get<string>('ACCESS_TOKEN_SECRET'),
       });
       request.user = user;
     } catch (error) {
-      throw new UnauthorizedException(
-        MSG_EXCEPTION.UNAUTHORIZED_TOKEN,
-        MSG_EXCEPTION.UNAUTHORIZED_TOKEN_EXPIRED,
-      );
+      throw new UnauthorizedException(MSG_EXCEPTION.UNAUTHORIZED_TOKEN, MSG_EXCEPTION.UNAUTHORIZED_TOKEN_EXPIRED);
     }
     return true;
   }
