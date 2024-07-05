@@ -12,6 +12,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Permission } from './users/entities/permission.entity';
 import { Role } from './users/entities/role.entity';
 import { RefreshToken } from './auth/entities/token.entity';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { RefreshToken } from './auth/entities/token.entity';
     }),
     AuthModule,
     UsersModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
