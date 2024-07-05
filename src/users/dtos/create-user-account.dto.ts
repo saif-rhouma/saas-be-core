@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Expose, Transform } from 'class-transformer';
-export class UserDto {
+
+export class CreateUserAccountDto {
   @Expose()
   id: number;
 
@@ -17,10 +18,4 @@ export class UserDto {
 
   @Expose()
   accountType: string;
-
-  @Expose()
-  accessToken: string;
-
-  @Expose()
-  refreshToken: string;
 }
