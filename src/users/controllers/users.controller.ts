@@ -28,22 +28,6 @@ export class UsersController {
     return 'Hello There!!!';
   }
 
-  //! Protected Route By Role
-  @Roles([RoleType.ADMIN, RoleType.STAFF])
-  @UseGuards(AuthenticationGuard, AuthorizationGuard)
-  @Get('role')
-  async roleProtected() {
-    return 'Hello There!!!';
-  }
-
-  //! Protected Route By Permission
-  @Permissions([PermissionType.PRINT_ORDER])
-  @UseGuards(AuthenticationGuard, AuthorizationGuard)
-  @Get('permission')
-  async permissionProtected() {
-    return 'Hello There!!!';
-  }
-
   @Get('/:id')
   async findUser(@Param('id') id: string) {
     const user = await this.usersService.findOne(parseInt(id));
@@ -51,6 +35,26 @@ export class UsersController {
     if (!user) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER);
     }
+    return user;
+  }
+
+  //! New route to assign role to a user
+  @Roles([RoleType.ADMIN, RoleType.STAFF])
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Post('assign-role')
+  async assignRole(@Body('userId') userId: number, @Body('roleName') roleName: string) {
+    console.log('userId', userId, 'roleName', roleName);
+    const user = await this.usersService.assignRole(userId, roleName);
+    return user;
+  }
+
+  //! New route to assign permission to a user
+  @Permissions([PermissionType.PRINT_ORDER])
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @Post('assign-permission')
+  async assignPermission(@Body('userId') userId: number, @Body('permissionSlug') permissionSlug: string) {
+    console.log('userId', userId, 'permissionSlug', permissionSlug);
+    const user = await this.usersService.assignPermission(userId, permissionSlug);
     return user;
   }
 }
