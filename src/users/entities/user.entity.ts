@@ -15,6 +15,7 @@ import {
 import { RefreshToken } from '../../auth/entities/token.entity';
 import { Role } from './role.entity';
 import { Permission } from './permission.entity';
+import { Application } from 'src/applications/entities/application.entity';
 
 @Entity()
 export class User {
@@ -32,6 +33,10 @@ export class User {
 
   @UpdateDateColumn()
   updateTime: Date;
+
+  @ManyToMany(() => Application, (application) => application.users)
+  @JoinTable()
+  applications: Application[];
 
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable()
