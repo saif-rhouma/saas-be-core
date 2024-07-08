@@ -17,22 +17,65 @@ import { Role } from './role.entity';
 import { Permission } from './permission.entity';
 import { Application } from 'src/applications/entities/application.entity';
 
+export enum AccountType {
+  Free = 'Free',
+  Basic = 'Basic',
+  Standard = 'Standard',
+  Premium = 'Premium',
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+    nullable: false,
+    unique: true,
+  })
   email: string;
 
   @Column()
   password: string;
 
-  @CreateDateColumn()
-  createTime: Date;
+  @Column({
+    nullable: true,
+  })
+  phoneNumber: string;
 
-  @UpdateDateColumn()
-  updateTime: Date;
+  @Column('text', { default: AccountType.Free })
+  accountType: AccountType;
+
+  @Column({
+    nullable: true,
+  })
+  avatar: string;
+
+  @Column('simple-json', {
+    nullable: true,
+  })
+  applicationThemeSetting: {
+    appearance: { darkMode: boolean; contrast: boolean; compact: boolean; rightToLeft: boolean };
+    navBar: { layout: string; color: string };
+    presetsColor: string;
+  };
+
+  @Column('simple-json', {
+    nullable: true,
+  })
+  address: {
+    country: string;
+    state: string;
+    city: string;
+    zipCode: string;
+    street: string;
+  };
+
+  // @Column('simple-json')
+  // applicationFinanceSetting: { currencySymbol: string; taxPercentage: number };
+
+  // @Column('simple-json')
+  // applicationSetting: { printerPOS: PrintPOSType };
 
   @ManyToMany(() => Application, (application) => application.users)
   @JoinTable()
@@ -47,6 +90,12 @@ export class User {
 
   @OneToMany(() => RefreshToken, (token) => token.user)
   tokens: RefreshToken[];
+
+  @CreateDateColumn()
+  createTime: Date;
+
+  @UpdateDateColumn()
+  updateTime: Date;
 
   @AfterInsert()
   logInsert() {
@@ -63,3 +112,28 @@ export class User {
     console.log('Updated User with id', this.id);
   }
 }
+
+// enum NavLayoutType {
+//   Default = 'Default',
+//   TopBar = 'TopBar',
+//   Small = 'Small',
+// }
+
+// enum NavColor {
+//   Integrate = 'Integrate',
+//   Apparent = 'Apparent',
+// }
+
+// enum PresetsColor {
+//   Preset01,
+//   Preset02,
+//   Preset03,
+//   Preset04,
+//   Preset05,
+//   Preset06,
+// }
+
+// enum PrintPOSType {
+//   A4 = 'A4',
+//   Thermal = 'Thermal',
+// }

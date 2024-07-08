@@ -1,12 +1,13 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { User } from '../entities/user.entity';
+import { AccountType, User } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from './roles.service';
 import { CreateUserDto } from 'src/auth/dtos/create-user.dto';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { PermissionsService } from './permissions.service';
+import { hashPassword } from 'src/common/helpers/hash-password.func';
 
 @Injectable()
 export class UsersService {
@@ -79,7 +80,6 @@ export class UsersService {
       return null;
     }
     const user = this.repo.findOneBy({ id });
-    console.log('---->> user', user);
     return user;
   }
 
@@ -92,7 +92,20 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER);
     }
+    if (attrs.password) {
+      const hashedPassword = await hashPassword(attrs.password);
+      attrs.password = hashedPassword;
+    }
     Object.assign(user, attrs);
+    return this.repo.save(user);
+  }
+
+  async upgradeUser(id: number, accountType: AccountType) {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER);
+    }
+    user.accountType = accountType;
     return this.repo.save(user);
   }
 
