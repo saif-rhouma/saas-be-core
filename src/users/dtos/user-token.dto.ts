@@ -13,6 +13,12 @@ export class UserTokenDto {
   roles: string[];
 
   @Expose()
+  phoneNumber: string;
+
+  @Expose()
+  accountType: string;
+
+  @Expose()
   accessToken: string;
 
   @Expose()

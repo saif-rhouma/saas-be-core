@@ -11,5 +11,7 @@ export class CreateUserDto {
 
   @IsString()
   role: string;
-  // Other Attribute will be ADDED!
+
+  @IsString()
+  phoneNumber: string;
 }
