@@ -6,7 +6,7 @@ import {
     ManyToMany,
     JoinTable,
   } from 'typeorm';
-import { Orders } from './orders.entity';
+import { Order } from './order.entity';
 
   
 export enum Status {
@@ -15,7 +15,7 @@ export enum Status {
 }
   
   @Entity()
-  export class Services {
+  export class Service {
     @PrimaryGeneratedColumn()
     id: number;
   
@@ -32,8 +32,8 @@ export enum Status {
     @Column('text', { default: Status.Active })   
     status: string;
 
-    @ManyToMany(() => Orders, (Orders) => Orders.services)
+    @ManyToMany(() => Order, (Order) => Order.services)
     @JoinTable()
-    orders: Orders[];
+    orders: Order[];
   }
   

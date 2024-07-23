@@ -5,20 +5,26 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     ManyToMany,
+    ManyToOne,
     JoinTable,
   } from 'typeorm';
-import { Services } from './services.entity';
+import { Service } from './service.entity';
+import { Customer } from './customer.entity';
   
   @Entity()
-  export class Orders {
+  export class Order {
     @PrimaryGeneratedColumn()
     id: number;
   
-    @ManyToMany(() => Services, (Services) => Services.orders)
+    @ManyToMany(() => Service, (Service) => Service.orders)
     @JoinTable()
-    services: Services[];
+    services: Service[];
 
-    serviceName: string;   //todo add new  entity 
+    @ManyToOne(() => Customer, (Customer) => Customer.orders)
+    @JoinTable()
+    Customers: Customer[];
+
+   // serviceName: string;   //todo add new  entity 
     
     @Column({
       nullable: false,
