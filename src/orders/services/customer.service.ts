@@ -3,20 +3,21 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from '../entities/order.entity';
-import { CreateOrderDto } from '../dtos/create-order.dto';
+import { CreateCustomerDto } from '../dtos/create-customer.dto';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
+import { Customer } from '../entities/customer.entity';
 
 @Injectable()
-export class OrderService {
+export class CustomerService {
   constructor(
-    @InjectRepository(Order) private repo: Repository<Order>
+    @InjectRepository(Order) private repo: Repository<Customer>
   ) {
 
-  }
+    }
 
-  create(OrderData: CreateOrderDto) {
-    const order = this.repo.create(OrderData);
-    return this.repo.save(order);
+  create(CustomerData: CreateCustomerDto) {
+    const customer = this.repo.create(CustomerData);
+    return this.repo.save(customer);
   }
 
   findOne(id: number) {
@@ -34,7 +35,7 @@ export class OrderService {
     return this.repo.remove(order);
   }
 
-  async update(id: number, attrs: Partial<Order>) {
+  async update(id: number, attrs: Partial<Customer>) {
     const order = await this.findOne(id);
     if (!order) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_ORDER);

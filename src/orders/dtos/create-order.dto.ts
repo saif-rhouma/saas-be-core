@@ -5,13 +5,13 @@ export class CreateOrderDto {
   @Expose()
   id: number;
 
-  @Expose()
+  @Expose()  
   email: string;
 
-  @Expose()
+  // @Expose()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @Transform(({ value, obj }) => obj.roles.map((Customer) => Customer.name))
-  customers: string[];
+  // @Transform(({ value, obj }) => obj.roles.map((Customer) => Customer.name))
+  // customers: string[];
 
   @Expose()
   phoneNumber: string;

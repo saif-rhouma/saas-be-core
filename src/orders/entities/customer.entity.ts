@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {
     Column,
-    CreateDateColumn,
     Entity,
     PrimaryGeneratedColumn,
     OneToMany,
@@ -19,11 +18,9 @@ export enum Status {
     @PrimaryGeneratedColumn()
     id: number;
   
-    @OneToMany(() => Order, (Order) => Order.customers)
+    @OneToMany(() => Order, (Order) => Order.Customers)
     @JoinTable()
-    orders: Customer[];
-
-   // serviceName: string;   //todo add new  entity 
+    orders: Order[];
     
     @Column({
       nullable: false,

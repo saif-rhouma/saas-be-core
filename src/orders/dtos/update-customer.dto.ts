@@ -1,11 +1,13 @@
 /* eslint-disable prettier/prettier */
-import { Expose, Transform } from 'class-transformer';
+import { IsEmail, IsJSON, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
-export class CreateCustomerDto {
-  @Expose()
+export class UpdateCustomerDto {
+  @IsNumber()
+  @IsNotEmpty()
   id: number;
 
-  @Expose()
+  @IsEmail()
+  @IsOptional()
   name: string;
 
   //@Expose()
@@ -13,18 +15,23 @@ export class CreateCustomerDto {
   //@Transform(({ value, obj }) => obj.roles.map((Order) => Order.name))
   //orders: string[];
 
-  @Expose()
+  @IsEmail()
+  @IsOptional()
   city: string;
 
-  @Expose()
+  @IsEmail()
+  @IsOptional()
   phoneNumber: number;
 
-  @Expose()
+  @IsEmail()
+  @IsOptional()
   taxNumber: number;
 
-  @Expose()
+  @IsEmail()
+  @IsOptional()
   Address: string;
 
-  @Expose()
+  @IsEmail()
+  @IsOptional()
   isActive: string;
 }
