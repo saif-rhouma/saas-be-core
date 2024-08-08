@@ -11,11 +11,12 @@ import { RolesController } from './controllers/roles.controller';
 import { RolesService } from './services/roles.service';
 import { PermissionsService } from './services/permissions.service';
 import { PermissionsController } from './controllers/permissions.controller';
+import { Application } from 'src/applications/entities/application.entity';
 
 @Module({
   controllers: [UsersController, RolesController, PermissionsController],
   providers: [UsersService, RolesService, PermissionsService],
-  imports: [TypeOrmModule.forFeature([User, RefreshToken, Role, Permission])],
+  imports: [TypeOrmModule.forFeature([User, RefreshToken, Role, Permission, Application])],
   exports: [UsersService, RolesService],
 })
 export class UsersModule {}
