@@ -15,6 +15,8 @@ import { Role } from './users/entities/role.entity';
 import { RefreshToken } from './auth/entities/token.entity';
 import { Product } from './product/entities/product.entity';
 
+import { ApplicationsModule } from './applications/applications.module';
+import { Application } from './applications/entities/application.entity';
 
 @Module({
   imports: [
@@ -38,13 +40,14 @@ import { Product } from './product/entities/product.entity';
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
           synchronize: true,
-          entities: [User, RefreshToken, Permission, Role, Product],
+          entities: [User, RefreshToken, Permission, Role, Product, Application],
         };
       },
     }),
     AuthModule,
     UsersModule,
     ProductsModule,
+    ApplicationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

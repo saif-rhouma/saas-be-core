@@ -15,6 +15,7 @@ import {
 import { RefreshToken } from '../../auth/entities/token.entity';
 import { Role } from './role.entity';
 import { Permission } from './permission.entity';
+import { Application } from 'src/applications/entities/application.entity';
 
 export enum AccountType {
   Free = 'Free',
@@ -70,11 +71,12 @@ export class User {
     street: string;
   };
 
-  // @Column('simple-json')
-  // applicationFinanceSetting: { currencySymbol: string; taxPercentage: number };
+  @OneToMany(() => Application, (application) => application.owner)
+  userOwnedApps: Application[];
 
-  // @Column('simple-json')
-  // applicationSetting: { printerPOS: PrintPOSType };
+  @ManyToMany(() => Application, (application) => application.users)
+  @JoinTable()
+  applications: Application[];
 
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable()
@@ -126,9 +128,4 @@ export class User {
 //   Preset04,
 //   Preset05,
 //   Preset06,
-// }
-
-// enum PrintPOSType {
-//   A4 = 'A4',
-//   Thermal = 'Thermal',
 // }
