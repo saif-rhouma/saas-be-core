@@ -71,11 +71,8 @@ export class User {
     street: string;
   };
 
-  // @Column('simple-json')
-  // applicationFinanceSetting: { currencySymbol: string; taxPercentage: number };
-
-  // @Column('simple-json')
-  // applicationSetting: { printerPOS: PrintPOSType };
+  @OneToMany(() => Application, (application) => application.owner)
+  userOwnedApps: Application[];
 
   @ManyToMany(() => Application, (application) => application.users)
   @JoinTable()
@@ -131,9 +128,4 @@ export class User {
 //   Preset04,
 //   Preset05,
 //   Preset06,
-// }
-
-// enum PrintPOSType {
-//   A4 = 'A4',
-//   Thermal = 'Thermal',
 // }
