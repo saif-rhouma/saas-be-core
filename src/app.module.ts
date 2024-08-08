@@ -7,11 +7,14 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
+import {ProductsModule} from './product/products.module';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Permission } from './users/entities/permission.entity';
 import { Role } from './users/entities/role.entity';
 import { RefreshToken } from './auth/entities/token.entity';
+import { Product } from './product/entities/product.entity';
+
 import { ApplicationsModule } from './applications/applications.module';
 import { Application } from './applications/entities/application.entity';
 
@@ -37,12 +40,13 @@ import { Application } from './applications/entities/application.entity';
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
           synchronize: true,
-          entities: [User, RefreshToken, Permission, Role, Application],
+          entities: [User, RefreshToken, Permission, Role, Product, Application],
         };
       },
     }),
     AuthModule,
     UsersModule,
+    ProductsModule,
     ApplicationsModule,
   ],
   controllers: [AppController],
