@@ -7,11 +7,14 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
+import {ProductsModule} from './product/products.module';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Permission } from './users/entities/permission.entity';
 import { Role } from './users/entities/role.entity';
 import { RefreshToken } from './auth/entities/token.entity';
+import { Product } from './product/entities/product.entity';
+
 
 @Module({
   imports: [
@@ -35,12 +38,13 @@ import { RefreshToken } from './auth/entities/token.entity';
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
           synchronize: true,
-          entities: [User, RefreshToken, Permission, Role],
+          entities: [User, RefreshToken, Permission, Role, Product],
         };
       },
     }),
     AuthModule,
     UsersModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
