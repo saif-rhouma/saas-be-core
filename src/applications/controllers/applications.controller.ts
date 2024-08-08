@@ -2,7 +2,7 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CreateApplicationDto } from '../dtos/create-application.dto';
 import { ApplicationsService } from '../services/applications.service';
-import { GetUser } from 'src/common/decorators/getuser.decorator';
+import { GetUser } from 'src/common/decorators/getUser.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { AuthenticationGuard } from 'src/common/guards/authentication.guard';
 import { ApplicationDto } from '../dtos/application.dto';

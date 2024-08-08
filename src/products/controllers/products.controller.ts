@@ -4,7 +4,7 @@ import { ProductService } from '../services/products.service';
 import { CreateProductDto } from '../dtos/create-product.dto';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { UpdateProductDto } from '../dtos/update-product.dto';
-import { GetUser } from 'src/common/decorators/getuser.decorator';
+import { GetUser } from 'src/common/decorators/getUser.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { AuthenticationGuard } from 'src/common/guards/authentication.guard';
 import { ProductDto } from '../dtos/product.dto';
