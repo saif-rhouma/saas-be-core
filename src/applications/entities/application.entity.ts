@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -6,6 +7,7 @@ import {
   Entity,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -66,6 +68,9 @@ export class Application {
 
   @ManyToMany(() => User, (user) => user.applications, { cascade: true })
   users: User[];
+
+  @OneToMany(() => Product, (product) => product.application)
+  products: Product[];
 
   @CreateDateColumn()
   createTime: Date;

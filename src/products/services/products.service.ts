@@ -6,13 +6,22 @@ import { Repository } from 'typeorm';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { CreateProductDto } from '../dtos/create-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
+import { ApplicationsService } from 'src/applications/services/applications.service';
 
 @Injectable()
 export class ProductService {
-  constructor(@InjectRepository(Product) private repo: Repository<Product>) {}
+  constructor(
+    @InjectRepository(Product) private repo: Repository<Product>,
+    private applicationsService: ApplicationsService,
+  ) {}
 
-  create(productData: CreateProductDto) {
+  async create(productData: CreateProductDto, applicationId: number) {
+    const application = await this.applicationsService.findOne(applicationId);
+    if (!application) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_APPLICATION);
+    }
     const product = this.repo.create(productData);
+    product.application = application;
     return this.repo.save(product);
   }
 
@@ -24,14 +33,14 @@ export class ProductService {
     return product;
   }
 
-  findByName(serviceName: string) {
-    return this.repo.find({ where: { serviceName } });
+  findByName(name: string) {
+    return this.repo.find({ where: { name } });
   }
 
   async remove(id: number) {
     const product = await this.findOne(id);
     if (!product) {
-      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_ROLE);
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
     }
     return this.repo.remove(product);
   }
@@ -43,7 +52,7 @@ export class ProductService {
   async update(id: number, prod: UpdateProductDto) {
     const product = await this.findOne(id);
     if (!product) {
-      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_ROLE);
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
     }
     Object.assign(product, prod);
     return this.repo.save(product);

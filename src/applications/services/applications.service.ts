@@ -30,6 +30,17 @@ export class ApplicationsService {
     return this.repo.find({ where: { name: applicationName } });
   }
 
+  findByOwnerId(ownerId: number) {
+    if (!ownerId) {
+      return null;
+    }
+    const application = this.repo.find({ where: { owner: { id: ownerId } } });
+    if (!application) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_APPLICATION);
+    }
+    return application;
+  }
+
   findOne(id: number) {
     if (!id) {
       return null;
@@ -46,5 +57,13 @@ export class ApplicationsService {
 
     Object.assign(application, attrs);
     return this.repo.save(application);
+  }
+
+  async remove(id: number) {
+    const application = await this.findOne(id);
+    if (!application) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_APPLICATION);
+    }
+    return this.repo.remove(application);
   }
 }

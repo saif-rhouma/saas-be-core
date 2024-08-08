@@ -2,14 +2,13 @@
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateProductDto {
-
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  serviceName: string;
+  name: string;
 
   @IsNotEmpty()
-  servicePrice: number;
+  price: number;
 
   @IsNotEmpty()
   isActive: boolean;

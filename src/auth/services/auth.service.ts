@@ -44,8 +44,8 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException(MSG_EXCEPTION.NOT_FOUND_USER);
     }
-    const [salt, storedHash] = user.password.split('.');
 
+    const [salt, storedHash] = user.password.split('.');
     const hash = (await scrypt(password, salt, 32)) as Buffer;
 
     if (hash.toString('hex') !== storedHash) {
