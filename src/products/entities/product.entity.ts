@@ -1,6 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { Application } from 'src/applications/entities/application.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { ProductToOrder } from 'src/orders/entities/product_order.entity';
+import { Plan } from 'src/plans/entities/plan.entity';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Product {
@@ -18,4 +20,10 @@ export class Product {
 
   @ManyToOne(() => Application, (application) => application.products)
   application: Application;
+
+  @OneToMany(() => Plan, (plan) => plan.product)
+  plans: Plan[];
+
+  @OneToMany(() => ProductToOrder, (productToOrder) => productToOrder.product, { cascade: true })
+  productToOrder!: ProductToOrder[];
 }

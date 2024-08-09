@@ -33,8 +33,20 @@ export class ProductService {
     return product;
   }
 
-  findByName(name: string) {
-    return this.repo.find({ where: { name } });
+  async findByIds(appId: number, ids: number[]) {
+    const products = await this.repo
+      .createQueryBuilder('product')
+      .where('(application.id = :id) AND (product.id IN (:...ids))', {
+        id: appId,
+        ids: ids,
+      })
+      .leftJoinAndSelect('product.application', 'application')
+      .getMany();
+    return products;
+  }
+
+  findByName(name: string, appId: number) {
+    return this.repo.find({ where: { name, application: { id: appId } } });
   }
 
   async remove(id: number) {
@@ -45,8 +57,8 @@ export class ProductService {
     return this.repo.remove(product);
   }
 
-  findAll() {
-    return this.repo.find();
+  findAll(appId: number) {
+    return this.repo.find({ where: { application: { id: appId } } });
   }
 
   async update(id: number, prod: UpdateProductDto) {

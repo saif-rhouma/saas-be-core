@@ -17,6 +17,17 @@ import { Product } from './products/entities/product.entity';
 
 import { ApplicationsModule } from './applications/applications.module';
 import { Application } from './applications/entities/application.entity';
+import { PlansModule } from './plans/plans.module';
+import { Plan } from './plans/entities/plan.entity';
+import { CustomersModule } from './customers/customers.module';
+import { Customer } from './customers/entities/customer.entity';
+import { OrdersModule } from './orders/orders.module';
+import { Order } from './orders/entities/order.entity';
+import { ProductToOrder } from './orders/entities/product_order.entity';
+import { PaymentsModule } from './payments/payments.module';
+import { Payment } from './payments/entities/payment.entity';
+import { TicketsModule } from './tickets/tickets.module';
+import { Ticket } from './tickets/entities/ticket.entity';
 
 @Module({
   imports: [
@@ -40,7 +51,20 @@ import { Application } from './applications/entities/application.entity';
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
           synchronize: true,
-          entities: [User, RefreshToken, Permission, Role, Product, Application],
+          entities: [
+            User,
+            RefreshToken,
+            Permission,
+            Role,
+            Product,
+            Application,
+            Plan,
+            Customer,
+            Order,
+            ProductToOrder,
+            Payment,
+            Ticket,
+          ],
         };
       },
     }),
@@ -48,6 +72,11 @@ import { Application } from './applications/entities/application.entity';
     UsersModule,
     ProductsModule,
     ApplicationsModule,
+    PlansModule,
+    CustomersModule,
+    OrdersModule,
+    PaymentsModule,
+    TicketsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

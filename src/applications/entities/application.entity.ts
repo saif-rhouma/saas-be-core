@@ -1,5 +1,10 @@
 /* eslint-disable prettier/prettier */
+import { Customer } from 'src/customers/entities/customer.entity';
+import { Order } from 'src/orders/entities/order.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
+import { Plan } from 'src/plans/entities/plan.entity';
 import { Product } from 'src/products/entities/product.entity';
+import { Ticket } from 'src/tickets/entities/ticket.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -71,6 +76,21 @@ export class Application {
 
   @OneToMany(() => Product, (product) => product.application)
   products: Product[];
+
+  @OneToMany(() => Customer, (customer) => customer.application)
+  customers: Customer[];
+
+  @OneToMany(() => Plan, (plan) => plan.application)
+  plans: Plan[];
+
+  @OneToMany(() => Order, (order) => order.application)
+  orders: Order[];
+
+  @OneToMany(() => Payment, (payment) => payment.application)
+  payments: Payment[];
+
+  @OneToMany(() => Ticket, (ticket) => ticket.application)
+  tickets: Ticket[];
 
   @CreateDateColumn()
   createTime: Date;

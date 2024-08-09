@@ -1,0 +1,50 @@
+/* eslint-disable prettier/prettier */
+import { Application } from 'src/applications/entities/application.entity';
+import { Product } from 'src/products/entities/product.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+
+export enum PlanStatus {
+  Ready = 'Ready',
+  Pending = 'Pending',
+  ProcessingA = 'ProcessingA',
+  ProcessingB = 'ProcessingB',
+}
+
+@Entity()
+export class Plan {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({
+    nullable: true,
+  })
+  planDate: Date;
+
+  @Column('text', { default: PlanStatus.Pending })
+  status: PlanStatus;
+
+  @Column({
+    nullable: true,
+    default: 1,
+  })
+  quantity: number;
+
+  @Column('boolean', { default: false })
+  isHidden: boolean;
+
+  @ManyToOne(() => Product, (product) => product.plans)
+  product: Product;
+
+  @ManyToOne(() => User, (user) => user.plans)
+  createdBy: User;
+
+  @ManyToOne(() => Application, (application) => application.plans)
+  application: Application;
+
+  @CreateDateColumn()
+  createTime: Date;
+
+  @UpdateDateColumn()
+  updateTime: Date;
+}

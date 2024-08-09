@@ -15,8 +15,8 @@ export class ProductDto {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @Transform(({ value, obj }) => {
     return {
-      id: obj.id,
-      name: obj.name,
+      id: obj.application.id,
+      name: obj.application.name,
     };
   })
   application;

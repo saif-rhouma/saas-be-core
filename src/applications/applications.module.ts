@@ -6,9 +6,12 @@ import { Application } from './entities/application.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApplicationsController } from './controllers/applications.controller';
 import { UsersModule } from 'src/users/users.module';
+import { Customer } from 'src/customers/entities/customer.entity';
+import { Plan } from 'src/plans/entities/plan.entity';
+import { Product } from 'src/products/entities/product.entity';
 @Module({
   controllers: [ApplicationsController],
-  imports: [UsersModule, TypeOrmModule.forFeature([User, Application])],
+  imports: [UsersModule, TypeOrmModule.forFeature([User, Application, Customer, Plan, Product])],
   providers: [ApplicationsService],
   exports: [ApplicationsService],
 })

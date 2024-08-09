@@ -40,11 +40,19 @@ export class ApplicationsController {
     return application;
   }
 
+  @UseGuards(AuthenticationGuard)
   @Patch()
   async updateApplication(@Body() appData: CreateApplicationDto, @GetUser() user: Partial<User>) {
     const appId = parseInt(user.userOwnedApps['id']);
     const application = await this.applicationsService.update(appId, appData);
     return application;
+  }
+
+  @UseGuards(AuthenticationGuard)
+  @Delete()
+  removeMyApplication(@GetUser() user: Partial<User>) {
+    const appId = parseInt(user.userOwnedApps['id']);
+    return this.applicationsService.remove(appId);
   }
 
   @Delete('/:id')

@@ -14,17 +14,21 @@ export class UserTokenDto {
 
   @Expose()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @Transform(({ value, obj }) =>
-    Object.assign(
-      {},
-      ...obj.userOwnedApps.map((app) => {
-        return {
-          id: app.id,
-          name: app.name,
-        };
-      }),
-    ),
-  )
+  @Transform(({ value, obj }) => {
+    try {
+      return Object.assign(
+        {},
+        ...obj.userOwnedApps?.map((app) => {
+          return {
+            id: app?.id,
+            name: app?.name,
+          };
+        }),
+      );
+    } catch (error) {
+      return Object.assign({});
+    }
+  })
   userOwnedApps;
 
   @Expose()

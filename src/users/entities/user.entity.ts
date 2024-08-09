@@ -16,6 +16,11 @@ import { RefreshToken } from '../../auth/entities/token.entity';
 import { Role } from './role.entity';
 import { Permission } from './permission.entity';
 import { Application } from 'src/applications/entities/application.entity';
+import { Plan } from 'src/plans/entities/plan.entity';
+import { Customer } from 'src/customers/entities/customer.entity';
+import { Order } from 'src/orders/entities/order.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
+import { Ticket } from 'src/tickets/entities/ticket.entity';
 
 export enum AccountType {
   Free = 'Free',
@@ -77,6 +82,24 @@ export class User {
   @ManyToMany(() => Application, (application) => application.users)
   @JoinTable()
   applications: Application[];
+
+  @OneToMany(() => Plan, (plan) => plan.createdBy)
+  plans: Plan[];
+
+  @OneToMany(() => Ticket, (ticket) => ticket.createdBy)
+  tickets: Ticket[];
+
+  @OneToMany(() => Ticket, (ticket) => ticket.member)
+  members: Ticket[];
+
+  @OneToMany(() => Customer, (customer) => customer.createdBy)
+  customers: Customer[];
+
+  @OneToMany(() => Order, (order) => order.createdBy)
+  orders: Order[];
+
+  @OneToMany(() => Payment, (payment) => payment.createdBy)
+  payments: Payment[];
 
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable()

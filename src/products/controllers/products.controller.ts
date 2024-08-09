@@ -36,12 +36,14 @@ export class ProductsController {
     return product;
   }
 
+  @UseGuards(AuthenticationGuard)
   @Get()
-  async findAllProducts() {
-    return this.productsService.findAll();
+  async findAllProducts(@GetUser() user: Partial<User>) {
+    const appId = parseInt(user.userOwnedApps['id']);
+    return this.productsService.findAll(appId);
   }
 
-  @Patch(':id')
+  @Patch('/:id')
   async updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(parseInt(id), updateProductDto);
   }
