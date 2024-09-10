@@ -88,8 +88,17 @@ export class PlansService {
     return plan;
   }
 
-  async update(id: number, appId: number, attrs: Partial<Plan>) {
+  async update(id: number, appId: number, attrs: Partial<Plan>, productId: number) {
+    let product;
     const plan = await this.findOneByApplication(id, appId);
+    if (productId) {
+      product = await this.productsService.findOne(productId);
+      if (!product) {
+        throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
+      }
+      plan.product = product;
+    }
+
     Object.assign(plan, attrs);
     return this.repo.save(plan);
   }

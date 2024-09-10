@@ -46,7 +46,7 @@ export class PlansController {
   @Patch('/:id')
   async updatePlan(@Param('id') id: string, @Body() planData: UpdatePlanDto, @GetUser() user: Partial<User>) {
     const appId = parseInt(user.userOwnedApps['id']);
-    const plan = await this.plansService.update(parseInt(id), appId, planData);
+    const plan = await this.plansService.update(parseInt(id), appId, planData, planData.productId);
     return plan;
   }
 

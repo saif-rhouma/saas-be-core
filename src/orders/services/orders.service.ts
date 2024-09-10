@@ -136,6 +136,20 @@ export class OrdersService {
     await this.repo.save(order);
   }
 
+  async updateAmount(order: Order) {
+    const [{ total }] = await this.repo.manager.query(
+      `SELECT SUM(p.amount) as total
+      FROM "order" o LEFT JOIN payment p 
+      ON p.orderId = o.id
+      WHERE o.id = ${order.id};`,
+    );
+
+    if (total) {
+      order.orderPaymentAmount = total;
+      await this.repo.save(order);
+    }
+  }
+
   async analytics(appId: number) {
     if (!appId) {
       return null;

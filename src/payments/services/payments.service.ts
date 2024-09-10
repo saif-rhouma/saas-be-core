@@ -9,6 +9,7 @@ import { UsersService } from 'src/users/services/users.service';
 import { CustomersService } from 'src/customers/services/customers.service';
 import { ApplicationsService } from 'src/applications/services/applications.service';
 import { OrdersService } from 'src/orders/services/orders.service';
+import { UpdatePaymentDto } from '../dtos/update-payment.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -26,6 +27,7 @@ export class PaymentsService {
     prePayment.amount = paymentData.amount;
     prePayment.notes = paymentData?.notes;
     prePayment.paymentType = paymentData.paymentType;
+    prePayment.attachments = paymentData.attachments;
 
     const payment = this.repo.create({ ...prePayment });
     if (!userId || !paymentData.orderId || !applicationId || !paymentData.customerId) {
@@ -108,5 +110,11 @@ export class PaymentsService {
     }
     await this.ordersService.subAmount(payment.order, payment.amount);
     return this.repo.remove(payment);
+  }
+
+  async update(id: number, appId: number, attrs: Partial<UpdatePaymentDto>) {
+    const payment = await this.findOneByApplication(id, appId);
+    Object.assign(payment, attrs);
+    return this.repo.save(payment);
   }
 }

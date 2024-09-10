@@ -14,9 +14,10 @@ import { Product } from 'src/products/entities/product.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Payment } from './entities/payment.entity';
 import { OrdersModule } from 'src/orders/orders.module';
+import { PaymentSubscriber } from './subscribers/payment.subscriber';
 
 @Module({
-  providers: [PaymentsService],
+  providers: [PaymentsService, PaymentSubscriber],
   controllers: [PaymentsController],
   imports: [
     UsersModule,

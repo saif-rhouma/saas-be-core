@@ -1882,7 +1882,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"paymentDate\" : \"2024-08-15\",\r\n    \"paymentType\":\"Cash\",\r\n    \"amount\":150,\r\n    \"notes\":\"Note 1\",\r\n    \"customerId\":6,\r\n    \"orderId\":1\r\n}",
+							"raw": "{\r\n    \"paymentDate\" : \"2024-08-15\",\r\n    \"paymentType\":\"Cash\",\r\n    \"amount\":150,\r\n    \"notes\":\"Note 1\",\r\n    \"customerId\":6,\r\n    \"orderId\":1,\r\n    \"attachments\":\"test 2\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1897,6 +1897,33 @@
 							"path": [
 								"payments",
 								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Payment (For App)",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"paymentDate\" : \"2024-08-15\",\r\n    \"paymentType\":\"Card\",\r\n    \"amount\":30,\r\n    \"notes\":\"Note 1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/payments/11",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"payments",
+								"11"
 							]
 						}
 					},
