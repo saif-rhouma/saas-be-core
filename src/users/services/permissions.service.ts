@@ -30,6 +30,14 @@ export class PermissionsService {
     return this.repo.find({ where: { slug } });
   }
 
+  findAll() {
+    return this.repo.find();
+  }
+
+  findByUser(userId: number) {
+    return this.repo.find({ where: { users: { id: userId } } });
+  }
+
   async remove(id: number) {
     const permission = await this.findOne(id);
     if (!permission) {

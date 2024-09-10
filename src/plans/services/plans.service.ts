@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Plan } from '../entities/plan.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -24,12 +24,12 @@ export class PlansService {
     }
     const user = await this.usersService.findOne(userId);
     if (!user) {
-      throw new UnauthorizedException(MSG_EXCEPTION.NOT_FOUND_USER);
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER);
     }
 
     const product = await this.productsService.findOne(productId);
     if (!product) {
-      throw new UnauthorizedException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
     }
 
     const application = await this.applicationsService.findOne(applicationId);
@@ -59,7 +59,10 @@ export class PlansService {
     if (!appId) {
       return null;
     }
-    const plan = this.repo.find({ where: { application: { id: appId } }, relations: { product: true } });
+    const plan = this.repo.find({
+      where: { application: { id: appId } },
+      relations: { product: true, createdBy: true },
+    });
     if (!plan) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PLAN);
     }

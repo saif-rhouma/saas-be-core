@@ -13,9 +13,6 @@ import { Permission } from 'src/users/entities/permission.entity';
 @Module({
   controllers: [AuthController],
   providers: [AuthService, TokenService],
-  imports: [
-    UsersModule,
-    TypeOrmModule.forFeature([User, RefreshToken, Permission, Role]),
-  ],
+  imports: [UsersModule, TypeOrmModule.forFeature([User, RefreshToken, Permission, Role])],
 })
 export class AuthModule {}

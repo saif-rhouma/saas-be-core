@@ -1,8 +1,13 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
 import { PermissionsService } from '../services/permissions.service';
 import { CreatePermissionDto } from '../dtos/create-permission.dto';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
+import { AuthenticationGuard } from 'src/common/guards/authentication.guard';
+import { GetUser } from 'src/common/decorators/getUser.decorator';
+import { User } from '../entities/user.entity';
+import { RoleType } from 'src/common/constants/roles';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('permissions')
 export class PermissionsController {
@@ -11,6 +16,26 @@ export class PermissionsController {
   @Post('/create')
   async createPermission(@Body() permissionData: CreatePermissionDto) {
     return this.permissionsService.create(permissionData);
+  }
+
+  @UseGuards(AuthenticationGuard)
+  @Get('/user')
+  async findUserPermissions(@GetUser() user: Partial<User>) {
+    const userId = user.id;
+    const permissions = await this.permissionsService.findByUser(userId);
+    if (!permissions) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PERMISSION);
+    }
+    return permissions;
+  }
+
+  @Get('/')
+  async findAllPermissions() {
+    const permissions = await this.permissionsService.findAll();
+    if (!permissions) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PERMISSION);
+    }
+    return permissions;
   }
 
   @Delete('/:id')

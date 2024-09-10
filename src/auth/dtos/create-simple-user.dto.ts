@@ -10,4 +10,13 @@ export class CreateSimpleUserDto {
   password: string;
 
   // Other Attribute will be ADDED!
+
+  @IsString()
+  firstName: string;
+
+  @IsString()
+  lastName: string;
+
+  @IsString()
+  phoneNumber: string;
 }

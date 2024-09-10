@@ -21,10 +21,12 @@ import { PermissionType } from 'src/common/constants/permissions';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { CreateUserDto } from 'src/auth/dtos/create-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
-import { AccountType } from '../entities/user.entity';
+import { AccountType, User } from '../entities/user.entity';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { CreateUserAccountDto } from '../dtos/create-user-account.dto';
 import { UpgradeUserDto } from '../dtos/upgrade-user.dto';
+import { GetUser } from 'src/common/decorators/getUser.decorator';
+import { StaffDto } from '../dtos/staff.dto';
 
 @Controller('users')
 export class UsersController {
@@ -55,6 +57,24 @@ export class UsersController {
   async upgradeUser(@Param('id') id: string, @Body() { accountType }: UpgradeUserDto) {
     const user = await this.usersService.upgradeUser(parseInt(id), accountType as AccountType);
     return user;
+  }
+
+  @Serialize(CreateUserAccountDto)
+  @UseGuards(AuthenticationGuard)
+  @Post('staff')
+  async createStaff(@Body() userData: CreateUserDto, @GetUser() user: Partial<User>) {
+    const appId = parseInt(user.userOwnedApps['id']);
+    const staff = await this.usersService.createStaff(userData, appId);
+    return staff;
+  }
+
+  @Serialize(StaffDto)
+  @UseGuards(AuthenticationGuard)
+  @Get('staff')
+  async findAllStaff(@GetUser() user: Partial<User>) {
+    const appId = parseInt(user.userOwnedApps['id']);
+    const staffs = await this.usersService.findAllStaffByApplication(appId);
+    return staffs;
   }
 
   //! Protected Route By Authentication [WILL BE DELETED]
@@ -92,5 +112,15 @@ export class UsersController {
   @Delete('/:id')
   removeUser(@Param('id') id: string) {
     return this.usersService.remove(parseInt(id));
+  }
+
+  //! Protected Route By Role [WILL BE DELETED / OR UPDATED]
+  // @Roles([RoleType.ADMIN, RoleType.USER])
+  @UseGuards(AuthenticationGuard)
+  @Post('assign')
+  async assignPermissions(@GetUser() user: Partial<User>, @Body() body: any) {
+    const { permission } = body;
+    await this.usersService.assignPermission(user.id, permission);
+    return 'Hello There!!!';
   }
 }

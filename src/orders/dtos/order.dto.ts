@@ -16,6 +16,9 @@ export class OrderDto {
   isHidden: boolean;
 
   @Expose()
+  deliveryDate: Date;
+
+  @Expose()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @Transform(({ value, obj }) => obj.createdBy.id)
   createdBy: number;

@@ -22,17 +22,18 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  async signup(email: string, password: string) {
-    const users = await this.usersService.find(email);
+  async signup(userData) {
+    const users = await this.usersService.find(userData.email);
     if (users.length) {
       // throw Exception !!!
       throw new BadRequestException(MSG_EXCEPTION.OTHER_ALREADY_IN_USE_EMAIL);
     }
     // Hash the users password
-    const result = await hashPassword(password);
+    const result = await hashPassword(userData.password);
+    delete userData.password;
     // Create a new user and save it
     const user = await this.usersService.createUser({
-      email,
+      ...userData,
       password: result,
       role: RoleType.USER,
     });
@@ -65,7 +66,7 @@ export class AuthService {
 
   async generateUserTokens(user) {
     delete user.password;
-    const accessToken = this.jwtService.sign({ user }, { expiresIn: '15m' });
+    const accessToken = this.jwtService.sign({ user }, { expiresIn: '3d' });
     const refreshToken = this.jwtService.sign({ user }, { secret: this.config.get<string>('REFRESH_TOKEN_SECRET') });
     return { accessToken, refreshToken };
   }

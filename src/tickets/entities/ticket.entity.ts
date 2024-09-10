@@ -1,7 +1,16 @@
 /* eslint-disable prettier/prettier */
 import { Application } from 'src/applications/entities/application.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { TicketMessage } from './ticket-message.entity';
 
 export enum Priority {
   Low = 'Low',
@@ -35,11 +44,19 @@ export class Ticket {
   @Column('text', { default: Priority.Medium })
   priority: Priority;
 
+  @Column({
+    nullable: true,
+  })
+  file: string;
+
   @Column('text', { default: TicketStatus.Open })
   status: TicketStatus;
 
   @ManyToOne(() => User, (user) => user.tickets)
   createdBy: User;
+
+  @OneToMany(() => TicketMessage, (message) => message.ticket, { cascade: true })
+  messages: TicketMessage[];
 
   @ManyToOne(() => Application, (application) => application.tickets)
   application: Application;

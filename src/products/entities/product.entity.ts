@@ -2,7 +2,9 @@
 import { Application } from 'src/applications/entities/application.entity';
 import { ProductToOrder } from 'src/orders/entities/product_order.entity';
 import { Plan } from 'src/plans/entities/plan.entity';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Stock } from 'src/stock/entities/stock.entity';
+import { Supplying } from 'src/stock/entities/supplying.entity';
+import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Product {
@@ -15,6 +17,11 @@ export class Product {
   @Column()
   price: number;
 
+  @Column({
+    nullable: true,
+  })
+  image: string;
+
   @Column()
   isActive: boolean;
 
@@ -24,6 +31,13 @@ export class Product {
   @OneToMany(() => Plan, (plan) => plan.product)
   plans: Plan[];
 
+  @OneToOne(() => Stock, (stock) => stock.product)
+  stock: Stock;
+
+  @OneToMany(() => Supplying, (supplying) => supplying.product)
+  supplyings: Supplying[];
+
   @OneToMany(() => ProductToOrder, (productToOrder) => productToOrder.product, { cascade: true })
   productToOrder!: ProductToOrder[];
+  product: Stock[];
 }

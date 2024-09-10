@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -9,6 +9,10 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   price: number;
+
+  @IsString()
+  @IsOptional()
+  image: string;
 
   @IsNotEmpty()
   isActive: boolean;

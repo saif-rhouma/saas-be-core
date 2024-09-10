@@ -17,9 +17,9 @@ export class CustomersController {
   @Serialize(CustomerDto)
   @UseGuards(AuthenticationGuard)
   @Post('/create')
-  async createRole(@Body() applicationData: CreateCustomerDto, @GetUser() user: Partial<User>) {
+  async createRole(@Body() customerData: CreateCustomerDto, @GetUser() user: Partial<User>) {
     const appId = parseInt(user.userOwnedApps['id']);
-    return this.customersService.createCustomer(applicationData, user.id, appId);
+    return this.customersService.createCustomer(customerData, user.id, appId);
   }
 
   @UseGuards(AuthenticationGuard)

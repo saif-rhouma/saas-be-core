@@ -1,9 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { Customer } from 'src/customers/entities/customer.entity';
+import { File } from 'src/files/entities/file.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { Plan } from 'src/plans/entities/plan.entity';
 import { Product } from 'src/products/entities/product.entity';
+import { Reminder } from 'src/reminders/entities/reminder.entity';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -91,6 +93,12 @@ export class Application {
 
   @OneToMany(() => Ticket, (ticket) => ticket.application)
   tickets: Ticket[];
+
+  @OneToMany(() => File, (file) => file.application)
+  files: File[];
+
+  @OneToMany(() => Reminder, (reminder) => reminder.application)
+  reminders: Reminder[];
 
   @CreateDateColumn()
   createTime: Date;

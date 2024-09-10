@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ApplicationsService } from './services/applications.service';
 import { User } from 'src/users/entities/user.entity';
 import { Application } from './entities/application.entity';
@@ -11,7 +11,7 @@ import { Plan } from 'src/plans/entities/plan.entity';
 import { Product } from 'src/products/entities/product.entity';
 @Module({
   controllers: [ApplicationsController],
-  imports: [UsersModule, TypeOrmModule.forFeature([User, Application, Customer, Plan, Product])],
+  imports: [forwardRef(() => UsersModule), TypeOrmModule.forFeature([User, Application, Customer, Plan, Product])],
   providers: [ApplicationsService],
   exports: [ApplicationsService],
 })

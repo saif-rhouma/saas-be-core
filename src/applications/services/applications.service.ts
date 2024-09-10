@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Application } from '../entities/application.entity';
 import { Repository } from 'typeorm';
@@ -10,6 +10,7 @@ import { UsersService } from 'src/users/services/users.service';
 export class ApplicationsService {
   constructor(
     @InjectRepository(Application) private repo: Repository<Application>,
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
   ) {}
 

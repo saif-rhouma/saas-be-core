@@ -12,6 +12,9 @@ export class ProductDto {
   isActive: boolean;
 
   @Expose()
+  image: boolean;
+
+  @Expose()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @Transform(({ value, obj }) => {
     return {

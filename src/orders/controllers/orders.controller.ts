@@ -34,6 +34,14 @@ export class OrdersController {
   }
 
   @UseGuards(AuthenticationGuard)
+  @Get('/analytics')
+  async ordersAnalytics(@GetUser() user: Partial<User>) {
+    const appId = parseInt(user.userOwnedApps['id']);
+    const analytics = await this.ordersService.analytics(appId);
+    return analytics;
+  }
+
+  @UseGuards(AuthenticationGuard)
   @Get('/:id')
   async findOrder(@Param('id') id: string, @GetUser() user: Partial<User>) {
     const appId = parseInt(user.userOwnedApps['id']);

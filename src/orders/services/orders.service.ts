@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { Order } from '../entities/order.entity';
+import { Order, OrderStatus } from '../entities/order.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/services/users.service';
@@ -134,5 +134,42 @@ export class OrdersService {
   async subAmount(order: Order, amount: number) {
     order.orderPaymentAmount -= amount;
     await this.repo.save(order);
+  }
+
+  async analytics(appId: number) {
+    if (!appId) {
+      return null;
+    }
+    const analytics = await this.repo.manager.query(
+      `select SUM(CASE WHEN status = '${OrderStatus.Ready}' THEN 1 ELSE 0 END) As Ready,
+      SUM(CASE WHEN status = '${OrderStatus.Delivered}' THEN 1 ELSE 0 END) AS Delivered,
+      SUM(CASE WHEN status = '${OrderStatus.InProcess}' THEN 1 ELSE 0 END) AS InProcess from 'order'
+      where applicationId = ${appId};`,
+    );
+    const inProcessLastSixMonth = await this.repo.manager.query(
+      `SELECT  COUNT(id) AS ClaimsPerMonth,
+        (strftime('%m', orderDate)) AS inMonth,
+        (strftime('%Y', orderDate)) AS inYear  FROM 'order'
+        WHERE orderDate >= DATE('now', '-7 months') and status = '${OrderStatus.InProcess}' and applicationId = ${appId}
+        GROUP BY strftime('%Y', orderDate), strftime('%m', orderDate)
+        ORDER BY inYear, inMonth`,
+    );
+    const deliveredLastSixMonth = await this.repo.manager.query(
+      `SELECT  COUNT(id) AS ClaimsPerMonth,
+        (strftime('%m', orderDate)) AS inMonth,
+        (strftime('%Y', orderDate)) AS inYear  FROM 'order'
+        WHERE orderDate >= DATE('now', '-7 months') and status = '${OrderStatus.Delivered}' and applicationId = ${appId}
+        GROUP BY strftime('%Y', orderDate), strftime('%m', orderDate)
+        ORDER BY inYear, inMonth`,
+    );
+    const lastSixMonth = await this.repo.manager.query(
+      `SELECT  COUNT(id) AS ClaimsPerMonth,
+        (strftime('%m', orderDate)) AS inMonth,
+        (strftime('%Y', orderDate)) AS inYear  FROM 'order'
+        WHERE orderDate >= DATE('now', '-7 months') and applicationId = ${appId}
+        GROUP BY strftime('%Y', orderDate), strftime('%m', orderDate)
+        ORDER BY inYear, inMonth`,
+    );
+    return { analytics: analytics[0], lastSixMonth, deliveredLastSixMonth, inProcessLastSixMonth };
   }
 }

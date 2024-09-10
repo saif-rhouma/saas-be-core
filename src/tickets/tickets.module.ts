@@ -7,10 +7,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Ticket } from './entities/ticket.entity';
 import { Application } from 'src/applications/entities/application.entity';
 import { User } from 'src/users/entities/user.entity';
+import { TicketMessage } from './entities/ticket-message.entity';
+import { TicketMessagesService } from './services/ticket-messages.service';
+import { TicketMessagesController } from './controllers/ticket-messages.controller';
 
 @Module({
-  controllers: [TicketsController],
-  providers: [TicketsService],
-  imports: [UsersModule, ApplicationsModule, TypeOrmModule.forFeature([User, Application, Ticket])],
+  controllers: [TicketsController, TicketMessagesController],
+  providers: [TicketsService, TicketMessagesService],
+  imports: [UsersModule, ApplicationsModule, TypeOrmModule.forFeature([User, Application, Ticket, TicketMessage])],
 })
 export class TicketsModule {}

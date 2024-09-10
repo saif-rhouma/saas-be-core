@@ -1,8 +1,17 @@
 /* eslint-disable prettier/prettier */
 import { Application } from 'src/applications/entities/application.entity';
 import { Product } from 'src/products/entities/product.entity';
+import { Supplying } from 'src/stock/entities/supplying.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export enum PlanStatus {
   Ready = 'Ready',
@@ -35,6 +44,9 @@ export class Plan {
 
   @ManyToOne(() => Product, (product) => product.plans)
   product: Product;
+
+  @OneToOne(() => Supplying, (supplying) => supplying.plan)
+  supplying: Supplying;
 
   @ManyToOne(() => User, (user) => user.plans)
   createdBy: User;

@@ -21,8 +21,10 @@ export class PlanDto {
 
   @Expose()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @Transform(({ value, obj }) => obj.createdBy.id)
-  createdBy: number;
+  @Transform(({ value, obj }) => {
+    return { id: obj.createdBy.id, firstName: obj.createdBy.firstName, lastName: obj.createdBy.lastName };
+  })
+  createdBy: any;
 
   @Expose()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

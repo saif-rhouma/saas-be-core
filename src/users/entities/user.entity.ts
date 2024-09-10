@@ -21,6 +21,9 @@ import { Customer } from 'src/customers/entities/customer.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
+import { TicketMessage } from 'src/tickets/entities/ticket-message.entity';
+import { Reminder } from 'src/reminders/entities/reminder.entity';
+import { File } from 'src/files/entities/file.entity';
 
 export enum AccountType {
   Free = 'Free',
@@ -42,6 +45,16 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column({
+    nullable: true,
+  })
+  firstName: string;
+
+  @Column({
+    nullable: true,
+  })
+  lastName: string;
 
   @Column({
     nullable: true,
@@ -92,6 +105,9 @@ export class User {
   @OneToMany(() => Ticket, (ticket) => ticket.member)
   members: Ticket[];
 
+  @OneToMany(() => TicketMessage, (ticketMessage) => ticketMessage.createdBy)
+  messages: TicketMessage[];
+
   @OneToMany(() => Customer, (customer) => customer.createdBy)
   customers: Customer[];
 
@@ -100,6 +116,12 @@ export class User {
 
   @OneToMany(() => Payment, (payment) => payment.createdBy)
   payments: Payment[];
+
+  @OneToMany(() => Reminder, (reminder) => reminder.createdBy)
+  reminders: Reminder[];
+
+  @OneToMany(() => File, (file) => file.createdBy)
+  files: File[];
 
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable()

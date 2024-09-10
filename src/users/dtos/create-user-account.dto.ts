@@ -9,6 +9,12 @@ export class CreateUserAccountDto {
   email: string;
 
   @Expose()
+  firstName: string;
+
+  @Expose()
+  lastName: string;
+
+  @Expose()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @Transform(({ value, obj }) => obj.roles.map((role) => role.name))
   roles: string[];

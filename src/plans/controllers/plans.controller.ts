@@ -22,6 +22,7 @@ export class PlansController {
     return this.plansService.createPlan(planData, user.id, planData.productId, appId);
   }
 
+  @Serialize(PlanDto)
   @UseGuards(AuthenticationGuard)
   @Get()
   async findAll(@GetUser() user: Partial<User>) {

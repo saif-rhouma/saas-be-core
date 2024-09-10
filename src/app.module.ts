@@ -28,6 +28,15 @@ import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
 import { TicketsModule } from './tickets/tickets.module';
 import { Ticket } from './tickets/entities/ticket.entity';
+import { TicketMessage } from './tickets/entities/ticket-message.entity';
+import { StockModule } from './stock/stock.module';
+import { Stock } from './stock/entities/stock.entity';
+import { Supplying } from './stock/entities/supplying.entity';
+import { FilesModule } from './files/files.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { File } from './files/entities/file.entity';
+import { RemindersModule } from './reminders/reminders.module';
+import { Reminder } from './reminders/entities/reminder.entity';
 
 @Module({
   imports: [
@@ -64,6 +73,11 @@ import { Ticket } from './tickets/entities/ticket.entity';
             ProductToOrder,
             Payment,
             Ticket,
+            TicketMessage,
+            Stock,
+            Supplying,
+            File,
+            Reminder,
           ],
         };
       },
@@ -77,6 +91,9 @@ import { Ticket } from './tickets/entities/ticket.entity';
     OrdersModule,
     PaymentsModule,
     TicketsModule,
+    StockModule,
+    FilesModule,
+    RemindersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

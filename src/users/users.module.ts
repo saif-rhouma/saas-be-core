@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { UsersController } from './controllers/users.controller';
 import { UsersService } from './services/users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,11 +12,15 @@ import { RolesService } from './services/roles.service';
 import { PermissionsService } from './services/permissions.service';
 import { PermissionsController } from './controllers/permissions.controller';
 import { Application } from 'src/applications/entities/application.entity';
+import { ApplicationsModule } from 'src/applications/applications.module';
 
 @Module({
   controllers: [UsersController, RolesController, PermissionsController],
   providers: [UsersService, RolesService, PermissionsService],
-  imports: [TypeOrmModule.forFeature([User, RefreshToken, Role, Permission, Application])],
+  imports: [
+    forwardRef(() => ApplicationsModule),
+    TypeOrmModule.forFeature([User, RefreshToken, Role, Permission, Application]),
+  ],
   exports: [UsersService, RolesService],
 })
 export class UsersModule {}
