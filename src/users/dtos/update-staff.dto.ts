@@ -1,7 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { IsBoolean, IsEmail, IsJSON, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
-export class UpdateUserDto {
+export class UpdateStaffDto {
+  @IsNumber()
+  @IsNotEmpty()
+  id: number;
+
   @IsEmail()
   @IsOptional()
   email: string;
@@ -14,14 +18,6 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   phoneNumber: string;
-
-  @IsString()
-  @IsOptional()
-  firstName: string;
-
-  @IsString()
-  @IsOptional()
-  lastName: string;
 
   @IsJSON()
   @IsOptional()

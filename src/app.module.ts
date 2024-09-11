@@ -37,6 +37,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { File } from './files/entities/file.entity';
 import { RemindersModule } from './reminders/reminders.module';
 import { Reminder } from './reminders/entities/reminder.entity';
+import { ProductAddon } from './products/entities/product-addon.entity';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { Reminder } from './reminders/entities/reminder.entity';
             Supplying,
             File,
             Reminder,
+            ProductAddon,
           ],
         };
       },

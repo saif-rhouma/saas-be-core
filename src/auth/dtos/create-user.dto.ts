@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsArray, IsBoolean, IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateUserDto {
   @IsEmail()
@@ -23,4 +23,12 @@ export class CreateUserDto {
 
   @IsString()
   phoneNumber: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isActive: boolean;
+
+  @IsOptional()
+  @IsArray()
+  Permissions: string[];
 }

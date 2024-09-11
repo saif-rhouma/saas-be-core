@@ -9,9 +9,13 @@ import { UsersModule } from 'src/users/users.module';
 import { Customer } from 'src/customers/entities/customer.entity';
 import { Plan } from 'src/plans/entities/plan.entity';
 import { Product } from 'src/products/entities/product.entity';
+import { ProductAddon } from 'src/products/entities/product-addon.entity';
 @Module({
   controllers: [ApplicationsController],
-  imports: [forwardRef(() => UsersModule), TypeOrmModule.forFeature([User, Application, Customer, Plan, Product])],
+  imports: [
+    forwardRef(() => UsersModule),
+    TypeOrmModule.forFeature([User, Application, Customer, Plan, Product, ProductAddon]),
+  ],
   providers: [ApplicationsService],
   exports: [ApplicationsService],
 })

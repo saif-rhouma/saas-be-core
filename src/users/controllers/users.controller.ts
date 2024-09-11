@@ -27,6 +27,7 @@ import { CreateUserAccountDto } from '../dtos/create-user-account.dto';
 import { UpgradeUserDto } from '../dtos/upgrade-user.dto';
 import { GetUser } from 'src/common/decorators/getUser.decorator';
 import { StaffDto } from '../dtos/staff.dto';
+import { UpdateStaffDto } from '../dtos/update-staff.dto';
 
 @Controller('users')
 export class UsersController {
@@ -45,10 +46,18 @@ export class UsersController {
     return user;
   }
 
+  @UseGuards(AuthenticationGuard)
   @Patch()
-  async updateUserSelfAccount(@Body() userData: UpdateUserDto) {
-    const user = await this.usersService.update(userData.id, userData);
-    return user;
+  async updateUserSelfAccount(@Body() userData: UpdateUserDto, @GetUser() user: Partial<User>) {
+    const res = await this.usersService.update(user.id, userData);
+    return res;
+  }
+
+  @UseGuards(AuthenticationGuard)
+  @Patch('staff')
+  async updateStaffAccount(@Body() userData: UpdateStaffDto) {
+    const res = await this.usersService.update(userData.id, userData);
+    return res;
   }
 
   @Roles([RoleType.ADMIN])

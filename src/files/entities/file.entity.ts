@@ -14,6 +14,8 @@ export enum FileCategory {
   Payment = 'Payment',
   Ticket = 'Ticket',
   Reminder = 'Reminder',
+  AppAvatar = 'AppAvatar',
+  Avatar = 'Avatar',
 }
 
 @Entity()

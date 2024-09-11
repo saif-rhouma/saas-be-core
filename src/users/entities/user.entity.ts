@@ -89,6 +89,12 @@ export class User {
     street: string;
   };
 
+  @Column({
+    nullable: true,
+    default: true,
+  })
+  isActive: boolean;
+
   @OneToMany(() => Application, (application) => application.owner)
   userOwnedApps: Application[];
 

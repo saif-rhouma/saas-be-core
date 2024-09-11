@@ -14,6 +14,9 @@ export class UserDto {
   firstName: string;
 
   @Expose()
+  avatar: string;
+
+  @Expose()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @Transform(({ value, obj }) => obj.roles.map((role) => role.name))
   roles: string[];
