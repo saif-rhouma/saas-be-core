@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { IsEmail, IsJSON, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsJSON, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
   @IsNumber()
@@ -26,4 +26,8 @@ export class UpdateUserDto {
   @IsJSON()
   @IsOptional()
   address;
+
+  @IsBoolean()
+  @IsOptional()
+  isActive: boolean;
 }

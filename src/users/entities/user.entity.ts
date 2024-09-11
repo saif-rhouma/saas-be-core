@@ -69,6 +69,12 @@ export class User {
   })
   avatar: string;
 
+  @Column({
+    nullable: true,
+    default: true,
+  })
+  isActive: boolean;
+
   @Column('simple-json', {
     nullable: true,
   })
