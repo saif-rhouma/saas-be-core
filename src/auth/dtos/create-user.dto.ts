@@ -25,6 +25,7 @@ export class CreateUserDto {
   @IsString()
   phoneNumber: string;
 
+
   @IsBoolean()
   @IsOptional()
   isActive: boolean;

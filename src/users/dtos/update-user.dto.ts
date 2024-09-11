@@ -27,6 +27,7 @@ export class UpdateUserDto {
   @IsOptional()
   address;
 
+
   @IsBoolean()
   @IsOptional()
   isActive: boolean;

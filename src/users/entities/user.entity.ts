@@ -75,6 +75,7 @@ export class User {
   })
   isActive: boolean;
 
+
   @Column('simple-json', {
     nullable: true,
   })
