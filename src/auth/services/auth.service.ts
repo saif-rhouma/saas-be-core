@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -11,6 +11,7 @@ import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { RoleType } from 'src/common/constants/roles';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { UserTokenDto } from 'src/users/dtos/user-token.dto';
+import { Logger } from 'winston';
 
 const scrypt = promisify(_scrypt);
 @Injectable()
@@ -20,48 +21,56 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private config: ConfigService,
+    @Inject('winston')
+    private readonly logger: Logger,
   ) {}
 
   async signup(userData) {
-    const users = await this.usersService.find(userData.email);
-    if (users.length) {
-      // throw Exception !!!
-      throw new BadRequestException(MSG_EXCEPTION.OTHER_ALREADY_IN_USE_EMAIL);
-    }
-    // Hash the users password
-    const result = await hashPassword(userData.password);
-    delete userData.password;
-    // Create a new user and save it
-    const user = await this.usersService.createUser({
-      ...userData,
-      password: result,
-      role: RoleType.USER,
-    });
-    return user;
+    try {
+      const users = await this.usersService.find(userData.email);
+      if (users.length) {
+        // throw Exception !!!
+        throw new BadRequestException(MSG_EXCEPTION.OTHER_ALREADY_IN_USE_EMAIL);
+      }
+      // Hash the users password
+      const result = await hashPassword(userData.password);
+      delete userData.password;
+      // Create a new user and save it
+      const user = await this.usersService.createUser({
+        ...userData,
+        password: result,
+        role: RoleType.USER,
+      });
+      return user;
+    } catch (error) {}
   }
 
   async login(email: string, password: string) {
-    const [user] = await this.usersService.find(email);
-    if (!user) {
-      throw new UnauthorizedException(MSG_EXCEPTION.NOT_FOUND_USER);
-    }
+    try {
+      const [user] = await this.usersService.find(email);
+      if (!user) {
+        throw new UnauthorizedException(MSG_EXCEPTION.NOT_FOUND_USER);
+      }
 
-    const [salt, storedHash] = user.password.split('.');
-    const hash = (await scrypt(password, salt, 32)) as Buffer;
+      const [salt, storedHash] = user.password.split('.');
+      const hash = (await scrypt(password, salt, 32)) as Buffer;
 
-    if (hash.toString('hex') !== storedHash) {
-      throw new UnauthorizedException(MSG_EXCEPTION.OTHER_BAD_PASSWORD);
-    }
-    // Serialize User For Token
-    const userPlain = instanceToPlain(user);
-    const userToken = plainToInstance(UserTokenDto, userPlain, { excludeExtraneousValues: true });
-    const { accessToken, refreshToken } = await this.generateUserTokens(userToken);
-    await this.storeRefreshToken(refreshToken, user);
-    return { ...user, accessToken, refreshToken };
+      if (hash.toString('hex') !== storedHash) {
+        throw new UnauthorizedException(MSG_EXCEPTION.OTHER_BAD_PASSWORD);
+      }
+      // Serialize User For Token
+      const userPlain = instanceToPlain(user);
+      const userToken = plainToInstance(UserTokenDto, userPlain, { excludeExtraneousValues: true });
+      const { accessToken, refreshToken } = await this.generateUserTokens(userToken);
+      await this.storeRefreshToken(refreshToken, user);
+      return { ...user, accessToken, refreshToken };
+    } catch (error) {}
   }
 
   async logout(refreshToken: string) {
-    return this.tokenService.remove(refreshToken);
+    try {
+      return this.tokenService.remove(refreshToken);
+    } catch (error) {}
   }
 
   async generateUserTokens(user) {
@@ -72,25 +81,29 @@ export class AuthService {
   }
 
   async refreshTokens(refreshToken: string) {
-    if (refreshToken == null) {
-      throw new UnauthorizedException();
-    }
-    const token = await this.tokenService.findOne(refreshToken);
+    try {
+      if (refreshToken == null) {
+        throw new UnauthorizedException();
+      }
+      const token = await this.tokenService.findOne(refreshToken);
 
-    if (!token) {
-      throw new UnauthorizedException();
-    }
-    const { user } = await this.jwtService.verify(refreshToken, {
-      secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
-    });
+      if (!token) {
+        throw new UnauthorizedException();
+      }
+      const { user } = await this.jwtService.verify(refreshToken, {
+        secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
+      });
 
-    const { accessToken } = await this.generateUserTokens(user);
-    return { accessToken };
+      const { accessToken } = await this.generateUserTokens(user);
+      return { accessToken };
+    } catch (error) {}
   }
 
   async storeRefreshToken(refreshToken, user) {
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 3);
-    this.tokenService.create(refreshToken, user, expiryDate);
+    try {
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + 3);
+      this.tokenService.create(refreshToken, user, expiryDate);
+    } catch (error) {}
   }
 }

@@ -7,6 +7,7 @@ import { GetUser } from 'src/common/decorators/getUser.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { UpdatePaymentDto } from '../dtos/update-payment.dto';
+import getApplicationId from 'src/common/helpers/application-id.func';
 
 @Controller('payments')
 export class PaymentsController {
@@ -16,14 +17,14 @@ export class PaymentsController {
   @UseGuards(AuthenticationGuard)
   @Post('/create')
   async createRole(@Body() paymentData: CreatePaymentDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.paymentsService.createPayment(paymentData, user.id, appId);
   }
 
   @UseGuards(AuthenticationGuard)
   @Get()
   async findAll(@GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const payments = await this.paymentsService.findAllByApplication(appId);
     if (!payments) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PAYMENT);
@@ -34,7 +35,7 @@ export class PaymentsController {
   @UseGuards(AuthenticationGuard)
   @Get('/:id')
   async findPayment(@Param('id') id: string, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const payment = await this.paymentsService.findOneByApplication(parseInt(id), appId);
     return payment;
   }
@@ -42,14 +43,14 @@ export class PaymentsController {
   @UseGuards(AuthenticationGuard)
   @Delete('/:id')
   removePayment(@Param('id') id: string, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.paymentsService.remove(parseInt(id), appId);
   }
 
   @UseGuards(AuthenticationGuard)
   @Patch('/:id')
   async updatePlan(@Param('id') id: string, @Body() paymentData: UpdatePaymentDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const payment = await this.paymentsService.update(parseInt(id), appId, paymentData);
     return payment;
   }

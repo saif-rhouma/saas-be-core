@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 
 export enum PlanStatus {
+  Waiting = 'Waiting',
   Ready = 'Ready',
   Pending = 'Pending',
   ProcessingA = 'ProcessingA',
@@ -41,6 +42,9 @@ export class Plan {
 
   @Column('boolean', { default: false })
   isHidden: boolean;
+
+  @Column('boolean', { default: false })
+  isTransferred: boolean;
 
   @ManyToOne(() => Product, (product) => product.plans)
   product: Product;

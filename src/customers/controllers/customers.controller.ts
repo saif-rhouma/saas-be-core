@@ -9,6 +9,7 @@ import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { UpdateCustomerDto } from '../dtos/update-customer.dto';
 import { CustomerDto } from '../dtos/customer.dto';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import getApplicationId from 'src/common/helpers/application-id.func';
 
 @Controller('customers')
 export class CustomersController {
@@ -18,14 +19,14 @@ export class CustomersController {
   @UseGuards(AuthenticationGuard)
   @Post('/create')
   async createRole(@Body() customerData: CreateCustomerDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.customersService.createCustomer(customerData, user.id, appId);
   }
 
   @UseGuards(AuthenticationGuard)
   @Get()
   async findAll(@GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const customers = await this.customersService.findAllByApplication(appId);
     if (!customers) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_CUSTOMER);
@@ -49,7 +50,7 @@ export class CustomersController {
     @Body() customerData: UpdateCustomerDto,
     @GetUser() user: Partial<User>,
   ) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const customer = await this.customersService.update(parseInt(id), appId, customerData);
     return customer;
   }
@@ -57,7 +58,7 @@ export class CustomersController {
   @UseGuards(AuthenticationGuard)
   @Delete('/:id')
   removeCustomer(@Param('id') id: string, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.customersService.remove(parseInt(id), appId);
   }
 }

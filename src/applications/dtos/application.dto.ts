@@ -17,4 +17,22 @@ export class ApplicationDto {
 
   @Expose()
   taxPercentage: number;
+
+  @Expose()
+  phoneNumber: string;
+
+  @Expose()
+  description: string;
+
+  @Expose()
+  email: string;
+
+  @Expose()
+  address: string;
+
+  @Expose()
+  taxNumber: string;
+
+  @Expose()
+  financialYear;
 }

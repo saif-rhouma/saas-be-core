@@ -1,8 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { Application } from 'src/applications/entities/application.entity';
 import { Plan } from 'src/plans/entities/plan.entity';
 import { Product } from 'src/products/entities/product.entity';
-import { User } from 'src/users/entities/user.entity';
 // import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -19,7 +17,7 @@ export enum SupplyingStatus {
   Processing = 'Processing Stock',
   Ready = 'Ready To Deliver Stock',
   Delivered = 'Delivered Stock',
-  Transfered = 'Transfered To Stock',
+  Transferred = 'Transferred To Stock',
 }
 
 @Entity()

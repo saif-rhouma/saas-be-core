@@ -33,17 +33,43 @@ import { StockModule } from './stock/stock.module';
 import { Stock } from './stock/entities/stock.entity';
 import { Supplying } from './stock/entities/supplying.entity';
 import { FilesModule } from './files/files.module';
-import { MulterModule } from '@nestjs/platform-express';
 import { File } from './files/entities/file.entity';
 import { RemindersModule } from './reminders/reminders.module';
 import { Reminder } from './reminders/entities/reminder.entity';
 import { ProductAddon } from './products/entities/product-addon.entity';
+import { FinancialModule } from './financial/financial.module';
+import { Financial } from './financial/entities/financial-year.entity';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    WinstonModule.forRoot({
+      format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+      transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({
+          dirname: join(__dirname, './../log/debug/'),
+          filename: 'debug.log',
+          level: 'debug',
+        }),
+        new winston.transports.File({
+          dirname: join(__dirname, './../log/error/'),
+          filename: 'error.log',
+          level: 'error',
+        }),
+        new winston.transports.File({
+          dirname: join(__dirname, './../log/info/'),
+          filename: 'info.log',
+          level: 'info',
+        }),
+      ],
     }),
     JwtModule.registerAsync({
       global: true,
@@ -80,6 +106,7 @@ import { ProductAddon } from './products/entities/product-addon.entity';
             File,
             Reminder,
             ProductAddon,
+            Financial,
           ],
         };
       },
@@ -96,6 +123,8 @@ import { ProductAddon } from './products/entities/product-addon.entity';
     StockModule,
     FilesModule,
     RemindersModule,
+    FinancialModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

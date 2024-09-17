@@ -10,6 +10,7 @@ import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { UpdateTicketMessageDto } from '../dtos/update-ticket-message.dto';
 import { TicketMessageDto } from '../dtos/ticket-message.dto';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import getApplicationId from 'src/common/helpers/application-id.func';
 
 @Controller('ticket-messages')
 export class TicketMessagesController {
@@ -19,7 +20,7 @@ export class TicketMessagesController {
   @UseGuards(AuthenticationGuard)
   @Post('/create')
   async createRole(@Body() messageData: CreateTicketMessageDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.ticketMessagesService.createTicketMessage(messageData, user.id, appId);
   }
 
@@ -44,7 +45,7 @@ export class TicketMessagesController {
   //   @UseGuards(AuthenticationGuard)
   //   @Delete('/:id')
   //   removeTicket(@Param('id') id: string, @GetUser() user: Partial<User>) {
-  //     const appId = parseInt(user.userOwnedApps['id']);
+  //     const appId = getApplicationId(user);
   //     return this.ticketsService.remove(parseInt(id), appId);
   //   }
 }

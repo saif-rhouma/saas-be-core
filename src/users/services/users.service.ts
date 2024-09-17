@@ -129,7 +129,7 @@ export class UsersService {
   }
 
   find(email: string) {
-    return this.repo.find({ where: { email }, relations: { roles: true, userOwnedApps: true } });
+    return this.repo.find({ where: { email }, relations: { roles: true, userOwnedApps: true, applications: true } });
   }
 
   findAllStaffByApplication(appId: number) {
@@ -138,10 +138,12 @@ export class UsersService {
     }
     const users = this.repo.find({
       where: { applications: { id: appId }, roles: { name: RoleType.STAFF } },
+      relations: { roles: true, userOwnedApps: true, applications: true },
     });
     if (!users) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);
     }
+    console.log('---> findAllStaffByApplication');
     return users;
   }
 

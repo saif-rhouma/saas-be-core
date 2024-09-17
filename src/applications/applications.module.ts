@@ -10,9 +10,12 @@ import { Customer } from 'src/customers/entities/customer.entity';
 import { Plan } from 'src/plans/entities/plan.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { ProductAddon } from 'src/products/entities/product-addon.entity';
+import { FinancialModule } from 'src/financial/financial.module';
+import { Financial } from 'src/financial/entities/financial-year.entity';
 @Module({
   controllers: [ApplicationsController],
   imports: [
+    forwardRef(() => FinancialModule),
     forwardRef(() => UsersModule),
     TypeOrmModule.forFeature([User, Application, Customer, Plan, Product, ProductAddon]),
   ],

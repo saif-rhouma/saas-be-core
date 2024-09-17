@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsNumber, IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateApplicationDto {
   @IsString()
@@ -16,11 +16,31 @@ export class CreateApplicationDto {
   @IsNumber()
   taxPercentage;
 
-  //   @IsString()
-  //   appLogo: string;
+  @IsOptional()
+  @IsString()
+  appLogo: string;
 
-  //   @IsString()
-  //   favicon: string;
+  @IsOptional()
+  @IsString()
+  favicon: string;
 
-  // Other Attribute will be ADDED!
+  @IsOptional()
+  @IsNumber()
+  taxNumber;
+
+  @IsOptional()
+  @IsObject()
+  address: any;
+
+  @IsOptional()
+  @IsString()
+  phoneNumber: string;
+
+  @IsOptional()
+  @IsString()
+  email: string;
+
+  @IsOptional()
+  @IsString()
+  description: string;
 }

@@ -8,6 +8,8 @@ import { AuthenticationGuard } from 'src/common/guards/authentication.guard';
 import { ApplicationDto } from '../dtos/application.dto';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
+import getApplicationId from 'src/common/helpers/application-id.func';
+import { UpdateApplicationDto } from '../dtos/update-application.dto';
 
 @Controller('applications')
 export class ApplicationsController {
@@ -23,7 +25,7 @@ export class ApplicationsController {
   @UseGuards(AuthenticationGuard)
   @Get()
   async findMyApp(@GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = parseInt(user.userOwnedApps['id'] || user.applications['id']);
     const application = await this.applicationsService.findOne(appId);
     if (!application) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_APPLICATION);
@@ -42,8 +44,8 @@ export class ApplicationsController {
 
   @UseGuards(AuthenticationGuard)
   @Patch()
-  async updateApplication(@Body() appData: CreateApplicationDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+  async updateApplication(@Body() appData: UpdateApplicationDto, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
     const application = await this.applicationsService.update(appId, appData);
     return application;
   }
@@ -51,7 +53,7 @@ export class ApplicationsController {
   @UseGuards(AuthenticationGuard)
   @Delete()
   removeMyApplication(@GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.applicationsService.remove(appId);
   }
 

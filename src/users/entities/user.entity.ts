@@ -24,6 +24,7 @@ import { Ticket } from 'src/tickets/entities/ticket.entity';
 import { TicketMessage } from 'src/tickets/entities/ticket-message.entity';
 import { Reminder } from 'src/reminders/entities/reminder.entity';
 import { File } from 'src/files/entities/file.entity';
+import { Financial } from 'src/financial/entities/financial-year.entity';
 
 export enum AccountType {
   Free = 'Free',
@@ -125,6 +126,9 @@ export class User {
 
   @OneToMany(() => Reminder, (reminder) => reminder.createdBy)
   reminders: Reminder[];
+
+  @OneToMany(() => Financial, (financial) => financial.createdBy)
+  financialYears: Financial[];
 
   @OneToMany(() => File, (file) => file.createdBy)
   files: File[];

@@ -15,9 +15,10 @@ import { ProductToOrder } from './entities/product_order.entity';
 import { CustomersModule } from 'src/customers/customers.module';
 import { ApplicationsModule } from 'src/applications/applications.module';
 import { ProductOrderService } from './services/product-order.service';
+import { OrdersStatusController } from './controllers/orders-status.controller';
 
 @Module({
-  controllers: [OrdersController],
+  controllers: [OrdersController, OrdersStatusController],
   providers: [OrdersService, ProductOrderService],
   imports: [
     UsersModule,

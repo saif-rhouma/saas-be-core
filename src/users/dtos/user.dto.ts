@@ -31,6 +31,7 @@ export class UserDto {
           return {
             id: app?.id,
             name: app?.name,
+            currencySymbol: app?.currencySymbol,
           };
         }),
       );

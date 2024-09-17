@@ -9,6 +9,7 @@ import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { UpdatePlanDto } from '../dtos/update-plan.dto';
 import { PlanDto } from '../dtos/plan.dto';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import getApplicationId from 'src/common/helpers/application-id.func';
 
 @Controller('plans')
 export class PlansController {
@@ -18,15 +19,23 @@ export class PlansController {
   @UseGuards(AuthenticationGuard)
   @Post('/create')
   async createRole(@Body() planData: CreatePlanDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.plansService.createPlan(planData, user.id, planData.productId, appId);
+  }
+
+  @UseGuards(AuthenticationGuard)
+  @Post('/stock/:id')
+  async transferToStock(@Param('id') id: string) {
+    console.log('----------> stock', id);
+    const plan = await this.plansService.transferToStock(parseInt(id));
+    return plan;
   }
 
   @Serialize(PlanDto)
   @UseGuards(AuthenticationGuard)
   @Get()
   async findAll(@GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const plans = await this.plansService.findAllByApplication(appId);
     if (!plans) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PLAN);
@@ -37,7 +46,7 @@ export class PlansController {
   @UseGuards(AuthenticationGuard)
   @Get('/:id')
   async findPlan(@Param('id') id: string, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const plan = await this.plansService.findOneByApplication(parseInt(id), appId);
     return plan;
   }
@@ -45,7 +54,7 @@ export class PlansController {
   @UseGuards(AuthenticationGuard)
   @Patch('/:id')
   async updatePlan(@Param('id') id: string, @Body() planData: UpdatePlanDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const plan = await this.plansService.update(parseInt(id), appId, planData, planData.productId);
     return plan;
   }
@@ -53,7 +62,7 @@ export class PlansController {
   @UseGuards(AuthenticationGuard)
   @Delete('/:id')
   removePlan(@Param('id') id: string, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.plansService.remove(parseInt(id), appId);
   }
 }

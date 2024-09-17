@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Customer } from 'src/customers/entities/customer.entity';
 import { File } from 'src/files/entities/file.entity';
+import { Financial } from 'src/financial/entities/financial-year.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { Plan } from 'src/plans/entities/plan.entity';
@@ -13,9 +14,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -46,11 +49,25 @@ export class Application {
   })
   favicon: string;
 
+  @Column({
+    nullable: true,
+  })
+  description: string;
+  @Column({
+    nullable: true,
+  })
+  email: string;
+  @Column({
+    nullable: true,
+  })
+  phoneNumber: string;
+
   @Column('text', { default: PrintPOSType.A4 })
   printerPOS: PrintPOSType;
 
   @Column({
     nullable: true,
+    default: 'USD',
     length: 20,
   })
   currencySymbol: string;
@@ -60,6 +77,11 @@ export class Application {
   })
   taxPercentage: number;
 
+  @Column({
+    nullable: true,
+  })
+  taxNumber: number;
+
   @Column('simple-json', {
     nullable: true,
   })
@@ -67,12 +89,17 @@ export class Application {
     country: string;
     state: string;
     city: string;
+    district: string;
     zipCode: string;
     street: string;
   };
 
   @ManyToOne(() => User, (user) => user.userOwnedApps)
   owner: User;
+
+  @OneToOne(() => Financial)
+  @JoinColumn()
+  financialYear: Financial;
 
   @ManyToMany(() => User, (user) => user.applications, { cascade: true })
   users: User[];
@@ -103,6 +130,9 @@ export class Application {
 
   @OneToMany(() => Reminder, (reminder) => reminder.application)
   reminders: Reminder[];
+
+  @OneToMany(() => Financial, (financial) => financial.application)
+  financialYears: Financial[];
 
   @CreateDateColumn()
   createTime: Date;

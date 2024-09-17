@@ -1,6 +1,14 @@
 /* eslint-disable prettier/prettier */
 import { Product } from 'src/products/entities/product.entity';
-import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Stock {
@@ -14,6 +22,7 @@ export class Stock {
   quantity: number;
 
   @OneToOne(() => Product, (product) => product.stock)
+  @JoinColumn()
   product: Product;
 
   @CreateDateColumn()

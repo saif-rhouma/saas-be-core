@@ -7,6 +7,7 @@ import { GetUser } from 'src/common/decorators/getUser.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { UpdateTicketDto } from '../dtos/update-ticket.dto';
+import getApplicationId from 'src/common/helpers/application-id.func';
 
 @Controller('tickets')
 export class TicketsController {
@@ -16,14 +17,14 @@ export class TicketsController {
   @UseGuards(AuthenticationGuard)
   @Post('/create')
   async createRole(@Body() ticketData: CreateTicketDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.ticketsService.createTicket(ticketData, appId, user.id);
   }
 
   @UseGuards(AuthenticationGuard)
   @Get('/analytics')
   async ordersAnalytics(@GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const analytics = await this.ticketsService.analytics(appId);
     return analytics;
   }
@@ -31,7 +32,7 @@ export class TicketsController {
   @UseGuards(AuthenticationGuard)
   @Get()
   async findAll(@GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const tickets = await this.ticketsService.findAllByApplication(appId);
     if (!tickets) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_TICKET);
@@ -42,7 +43,7 @@ export class TicketsController {
   @UseGuards(AuthenticationGuard)
   @Get('/:id')
   async findTicket(@Param('id') id: string, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const ticket = await this.ticketsService.findOneByApplication(parseInt(id), appId);
     return ticket;
   }
@@ -50,7 +51,7 @@ export class TicketsController {
   @UseGuards(AuthenticationGuard)
   @Patch('/:id')
   async updateTicket(@Param('id') id: string, @Body() ticketData: UpdateTicketDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const ticket = await this.ticketsService.update(parseInt(id), appId, ticketData);
     return ticket;
   }
@@ -58,7 +59,7 @@ export class TicketsController {
   @UseGuards(AuthenticationGuard)
   @Delete('/:id')
   removeTicket(@Param('id') id: string, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.ticketsService.remove(parseInt(id), appId);
   }
 }

@@ -32,6 +32,24 @@ export class UserTokenDto {
   userOwnedApps;
 
   @Expose()
+  @Transform(({ value, obj }) => {
+    try {
+      return Object.assign(
+        {},
+        ...obj.applications?.map((app) => {
+          return {
+            id: app?.id,
+            name: app?.name,
+          };
+        }),
+      );
+    } catch (error) {
+      return Object.assign({});
+    }
+  })
+  applications;
+
+  @Expose()
   phoneNumber: string;
 
   @Expose()

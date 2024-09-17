@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -5,6 +6,7 @@ import { ProductService } from 'src/products/services/products.service';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { CreateStockDto } from '../dtos/create-stock.dto';
 import { Stock } from '../entities/stock.entity';
+import { Product } from 'src/products/entities/product.entity';
 
 @Injectable()
 export class StockService {
@@ -21,6 +23,19 @@ export class StockService {
     const stock = this.repo.create(stockData);
     stock.product = product;
     return this.repo.save(stock);
+  }
+
+  async createFromPlan(quantity: number, product: Product) {
+    const { id } = product;
+    const stock = await this.findOneByProduct(id);
+    if (stock) {
+      stock.quantity += quantity;
+      return this.repo.save(stock);
+    } else {
+      const newStock = this.repo.create({ quantity });
+      newStock.product = product;
+      return this.repo.save(newStock);
+    }
   }
 
   findOne(id: number) {

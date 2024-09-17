@@ -28,6 +28,7 @@ import { UpgradeUserDto } from '../dtos/upgrade-user.dto';
 import { GetUser } from 'src/common/decorators/getUser.decorator';
 import { StaffDto } from '../dtos/staff.dto';
 import { UpdateStaffDto } from '../dtos/update-staff.dto';
+import getApplicationId from 'src/common/helpers/application-id.func';
 
 @Controller('users')
 export class UsersController {
@@ -72,16 +73,16 @@ export class UsersController {
   @UseGuards(AuthenticationGuard)
   @Post('staff')
   async createStaff(@Body() userData: CreateUserDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const staff = await this.usersService.createStaff(userData, appId);
     return staff;
   }
 
-  @Serialize(StaffDto)
+  // @Serialize(StaffDto)
   @UseGuards(AuthenticationGuard)
   @Get('staff')
   async findAllStaff(@GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     const staffs = await this.usersService.findAllStaffByApplication(appId);
     return staffs;
   }

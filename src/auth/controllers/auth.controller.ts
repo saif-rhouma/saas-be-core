@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Get, HttpCode, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, NotFoundException, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { LoginUserDto } from '../dtos/login-user.dto';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
@@ -12,12 +12,16 @@ import { UsersService } from 'src/users/services/users.service';
 import { GetUser } from 'src/common/decorators/getUser.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { UserMeDto } from '../dtos/user-me.dto';
+import getApplicationId from 'src/common/helpers/application-id.func';
+import { ApplicationsService } from 'src/applications/services/applications.service';
+import { MSG_EXCEPTION } from 'src/common/constants/messages';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
+    private applicationsService: ApplicationsService,
   ) {}
   @Serialize(UserDto)
   @Post('/signup')
@@ -39,6 +43,17 @@ export class AuthController {
   async authMe(@GetUser() user: Partial<User>) {
     const [userData] = await this.usersService.find(user.email);
     return userData;
+  }
+
+  @UseGuards(AuthenticationGuard)
+  @Get('/application')
+  async authApplication(@GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    const application = await this.applicationsService.findOne(appId);
+    if (!application) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_APPLICATION);
+    }
+    return application;
   }
 
   @HttpCode(HTTP_CODE.NO_CONTENT)

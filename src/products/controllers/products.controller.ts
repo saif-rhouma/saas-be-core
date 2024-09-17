@@ -9,6 +9,7 @@ import { User } from 'src/users/entities/user.entity';
 import { AuthenticationGuard } from 'src/common/guards/authentication.guard';
 import { ProductDto } from '../dtos/product.dto';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import getApplicationId from 'src/common/helpers/application-id.func';
 
 @Controller('products')
 export class ProductsController {
@@ -18,7 +19,7 @@ export class ProductsController {
   @UseGuards(AuthenticationGuard)
   @Post('/create')
   async createProduct(@Body() productData: CreateProductDto, @GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.productsService.create(productData, appId);
   }
 
@@ -39,7 +40,7 @@ export class ProductsController {
   @UseGuards(AuthenticationGuard)
   @Get()
   async findAllProducts(@GetUser() user: Partial<User>) {
-    const appId = parseInt(user.userOwnedApps['id']);
+    const appId = getApplicationId(user);
     return this.productsService.findAll(appId);
   }
 

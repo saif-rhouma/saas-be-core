@@ -20,6 +20,9 @@ export class PlanDto {
   isHidden: boolean;
 
   @Expose()
+  isTransferred: boolean;
+
+  @Expose()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @Transform(({ value, obj }) => {
     return { id: obj.createdBy.id, firstName: obj.createdBy.firstName, lastName: obj.createdBy.lastName };

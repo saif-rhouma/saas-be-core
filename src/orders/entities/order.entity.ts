@@ -15,6 +15,7 @@ import { ProductToOrder } from './product_order.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 
 export enum OrderStatus {
+  Draft = 'Draft',
   InProcess = 'InProcess',
   Ready = 'Ready',
   Delivered = 'Delivered',
@@ -47,7 +48,7 @@ export class Order {
   })
   totalOrderAmount: number;
 
-  @Column('text', { default: OrderStatus.InProcess })
+  @Column('text', { default: OrderStatus.Draft })
   status: OrderStatus;
 
   @Column('boolean', { default: false })

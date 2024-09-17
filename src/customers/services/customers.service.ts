@@ -76,4 +76,23 @@ export class CustomersService {
     Object.assign(customer, customerData);
     return this.repo.save(customer);
   }
+
+  async topFiveCustomers(appId: number) {
+    if (!appId) {
+      return null;
+    }
+
+    const LIMIT_ROW = 5;
+
+    const analytics = await this.repo.manager.query(`
+      SELECT c.* , COUNT(o.id) AS total_orders
+      FROM customer c 
+      LEFT JOIN "order" o ON o.customerId = c.id
+      LEFT JOIN application s ON o.applicationId = s.id
+      WHERE s.id = ${appId}
+      GROUP BY o.customerId
+      ORDER by total_orders DESC LIMIT ${LIMIT_ROW}`);
+
+    return analytics;
+  }
 }

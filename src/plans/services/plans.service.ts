@@ -1,12 +1,13 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Plan } from '../entities/plan.entity';
-import { Repository } from 'typeorm';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersService } from 'src/users/services/users.service';
+import { ApplicationsService } from 'src/applications/services/applications.service';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { ProductService } from 'src/products/services/products.service';
-import { ApplicationsService } from 'src/applications/services/applications.service';
+import { UsersService } from 'src/users/services/users.service';
+import { Repository } from 'typeorm';
+import { Plan, PlanStatus } from '../entities/plan.entity';
+import { StockService } from 'src/stock/services/stock.service';
 
 @Injectable()
 export class PlansService {
@@ -15,6 +16,9 @@ export class PlansService {
     private usersService: UsersService,
     private productsService: ProductService,
     private applicationsService: ApplicationsService,
+    @Inject(forwardRef(() => StockService))
+    private stockService: StockService,
+    // private supplyingService: SupplyingService,
   ) {}
 
   async createPlan(planData: Partial<Plan>, userId: number, productId: number, applicationId: number) {
@@ -40,7 +44,10 @@ export class PlansService {
     plan.createdBy = user;
     plan.product = product;
     plan.application = application;
-
+    // const suppData = new Supplying();
+    // suppData.orderedAt = new Date();
+    // suppData.quantity = plan.quantity;
+    // await this.supplyingService.createSupplying(suppData, plan, product);
     return this.repo.save(plan);
   }
 
@@ -80,11 +87,11 @@ export class PlansService {
     return plan;
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     if (!id) {
       return null;
     }
-    const plan = this.repo.findOneBy({ id });
+    const plan = await this.repo.findOne({ where: { id }, relations: { product: true } });
     return plan;
   }
 
@@ -112,5 +119,36 @@ export class PlansService {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PLAN);
     }
     return this.repo.remove(plan);
+  }
+
+  async transferToStock(planId: number) {
+    const plan = await this.findOne(planId);
+    if (!plan) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PLAN);
+    }
+    if (!plan.isTransferred) {
+      await this.stockService.createFromPlan(plan.quantity, plan.product);
+      plan.isTransferred = true;
+      return this.repo.save(plan);
+    }
+    return plan;
+  }
+
+  async getStockPlan(appId: number) {
+    const res = await this.repo.manager.query(
+      `SELECT 
+    pln.productId, prod.name, prod.image,
+    SUM(CASE WHEN status = '${PlanStatus.Ready}' THEN pln.quantity ELSE 0 END) AS ready_quantity,
+    SUM(CASE WHEN status = '${PlanStatus.Pending}' THEN pln.quantity ELSE 0 END) AS pending_quantity,
+    SUM(CASE WHEN status = '${PlanStatus.ProcessingA}' THEN pln.quantity ELSE 0 END) AS processing_a_quantity,
+    SUM(CASE WHEN status = '${PlanStatus.ProcessingB}' THEN pln.quantity ELSE 0 END) AS processing_b_quantity,
+    SUM(pln.quantity) AS totals_quantity
+    FROM "plan" pln
+    JOIN product prod ON prod.id = pln.productId 
+    WHERE pln.applicationId = ${appId}
+    GROUP BY pln.productId;`,
+    );
+
+    return res;
   }
 }
