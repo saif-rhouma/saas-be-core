@@ -1,10 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
-export class CreateStockDto {
-  @IsNumber()
-  @IsNotEmpty()
-  product: number;
+export class UpdateStockDto {
   @IsNumber()
   @IsNotEmpty()
   quantity: number;

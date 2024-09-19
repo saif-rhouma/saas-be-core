@@ -4,9 +4,16 @@ import { FilesController } from './controllers/files.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { File } from './entities/file.entity';
+import { UsersModule } from 'src/users/users.module';
+import { ApplicationsModule } from 'src/applications/applications.module';
 
 @Module({
-  imports: [MulterModule.register({ dest: './uploads' }), TypeOrmModule.forFeature([File])],
+  imports: [
+    UsersModule,
+    ApplicationsModule,
+    MulterModule.register({ dest: './uploads' }),
+    TypeOrmModule.forFeature([File]),
+  ],
   providers: [FilesService],
   controllers: [FilesController],
 })

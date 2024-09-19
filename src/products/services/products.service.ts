@@ -33,6 +33,19 @@ export class ProductService {
     return product;
   }
 
+  async findOneByApplication(id: number, appId: number) {
+    if (!id || !appId) {
+      return null;
+    }
+    const product = await this.repo.findOne({
+      where: { id, application: { id: appId } },
+    });
+    if (!product) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
+    }
+    return product;
+  }
+
   async findByIds(appId: number, ids: number[]) {
     const products = await this.repo
       .createQueryBuilder('product')
@@ -58,7 +71,7 @@ export class ProductService {
   }
 
   findAll(appId: number) {
-    return this.repo.find({ where: { application: { id: appId } } });
+    return this.repo.find({ where: { application: { id: appId } }, relations: { stock: true } });
   }
 
   findAllStock(appId: number) {

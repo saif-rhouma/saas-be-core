@@ -1,5 +1,17 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Delete, forwardRef, Get, Inject, NotFoundException, Param, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  forwardRef,
+  Get,
+  Inject,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { GetUser } from 'src/common/decorators/getUser.decorator';
 import { AuthenticationGuard } from 'src/common/guards/authentication.guard';
@@ -8,6 +20,8 @@ import { ProductService } from 'src/products/services/products.service';
 import { User } from 'src/users/entities/user.entity';
 import { StockService } from '../services/stock.service';
 import { PlansService } from 'src/plans/services/plans.service';
+import { CreateStockDto } from '../dtos/create-stock.dto';
+import { UpdateStockDto } from '../dtos/update-stock.dto';
 
 @Controller('stock')
 export class StockController {
@@ -17,13 +31,14 @@ export class StockController {
     @Inject(forwardRef(() => PlansService))
     private plansService: PlansService,
   ) {}
-  // @Serialize(ProductDto)
-  // @UseGuards(AuthenticationGuard)
-  // @Post('/create')
-  // async createProduct(@Body() productData: CreateProductDto, @GetUser() user: Partial<User>) {
-  //   const appId = getApplicationId(user);
-  //   return this.productsService.create(productData, appId);
-  // }
+
+  @UseGuards(AuthenticationGuard)
+  @Post('/create')
+  async createStock(@Body() stockData: CreateStockDto, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    return this.stocksService.createStock(stockData, appId);
+    return 'OK';
+  }
 
   @UseGuards(AuthenticationGuard)
   @Delete('/:id')
@@ -43,6 +58,7 @@ export class StockController {
           ...product.stock,
           name: product.name,
           image: product.image,
+          productId: product.id,
         }));
       return stocksWithNamesInStock;
     }
@@ -78,8 +94,10 @@ export class StockController {
     return product;
   }
 
-  // @Patch('/:id')
-  // async updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-  //   return this.stocksService.update(parseInt(id), updateProductDto);
-  // }
+  @UseGuards(AuthenticationGuard)
+  @Patch('/:id')
+  async updateProduct(@Param('id') id: string, @GetUser() user: Partial<User>, @Body() updateStockDto: UpdateStockDto) {
+    const appId = getApplicationId(user);
+    return this.stocksService.update(parseInt(id), appId, updateStockDto);
+  }
 }

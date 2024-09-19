@@ -1,17 +1,17 @@
 /* eslint-disable prettier/prettier */
-import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { Order, OrderStatus } from '../entities/order.entity';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
-import { UsersService } from 'src/users/services/users.service';
-import { ProductService } from 'src/products/services/products.service';
 import { ApplicationsService } from 'src/applications/services/applications.service';
-import { CustomersService } from 'src/customers/services/customers.service';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
-import { ProductOrderService } from './product-order.service';
+import { CustomersService } from 'src/customers/services/customers.service';
+import { ProductService } from 'src/products/services/products.service';
+import { UsersService } from 'src/users/services/users.service';
+import { Not, Repository } from 'typeorm';
+import { Logger } from 'winston';
 import { CreateOrderDto } from '../dtos/create-order.dto';
 import { UpdateOrderDto } from '../dtos/update-order.dto';
-import { Logger } from 'winston';
+import { Order, OrderStatus } from '../entities/order.entity';
+import { ProductOrderService } from './product-order.service';
 
 @Injectable()
 export class OrdersService {
@@ -33,12 +33,12 @@ export class OrdersService {
       }
       const user = await this.usersService.findOne(userId);
       if (!user) {
-        throw new UnauthorizedException(MSG_EXCEPTION.NOT_FOUND_USER);
+        throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER);
       }
 
       const customer = await this.customersService.findOne(orderData.customer);
       if (!customer) {
-        throw new UnauthorizedException(MSG_EXCEPTION.NOT_FOUND_CUSTOMER);
+        throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_CUSTOMER);
       }
 
       const application = await this.applicationsService.findOne(applicationId);

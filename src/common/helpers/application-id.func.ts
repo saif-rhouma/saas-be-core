@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { RoleType } from '../constants/roles';
 
 const getApplicationId = (user) => {

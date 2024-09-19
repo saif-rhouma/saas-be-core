@@ -121,13 +121,13 @@ export class PlansService {
     return this.repo.remove(plan);
   }
 
-  async transferToStock(planId: number) {
+  async transferToStock(planId: number, appId: number) {
     const plan = await this.findOne(planId);
     if (!plan) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PLAN);
     }
     if (!plan.isTransferred) {
-      await this.stockService.createFromPlan(plan.quantity, plan.product);
+      await this.stockService.createFromPlan(plan.quantity, plan.product, appId);
       plan.isTransferred = true;
       return this.repo.save(plan);
     }

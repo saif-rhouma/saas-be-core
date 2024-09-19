@@ -7,6 +7,7 @@ import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { CreateStockDto } from '../dtos/create-stock.dto';
 import { Stock } from '../entities/stock.entity';
 import { Product } from 'src/products/entities/product.entity';
+import { UpdateStockDto } from '../dtos/update-stock.dto';
 
 @Injectable()
 export class StockService {
@@ -15,19 +16,30 @@ export class StockService {
     private productsService: ProductService,
   ) {}
 
-  async createStock(stockData: CreateStockDto, productId: number) {
-    const product = await this.productsService.findOne(productId);
+  async createStock(stockData: CreateStockDto, appId: number) {
+    if (!appId) {
+      return null;
+    }
+    const product = await this.productsService.findOneByApplication(stockData.product, appId);
     if (!product) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
     }
-    const stock = this.repo.create(stockData);
-    stock.product = product;
-    return this.repo.save(stock);
+
+    const stock = await this.findOneByProduct(stockData.product, appId);
+
+    if (stock) {
+      stock.quantity = stockData.quantity;
+      return this.repo.save(stock);
+    } else {
+      const newStock = this.repo.create({ quantity: stockData.quantity });
+      newStock.product = product;
+      return this.repo.save(newStock);
+    }
   }
 
-  async createFromPlan(quantity: number, product: Product) {
+  async createFromPlan(quantity: number, product: Product, appId: number) {
     const { id } = product;
-    const stock = await this.findOneByProduct(id);
+    const stock = await this.findOneByProduct(id, appId);
     if (stock) {
       stock.quantity += quantity;
       return this.repo.save(stock);
@@ -58,20 +70,29 @@ export class StockService {
     return this.repo.remove(stock);
   }
 
-  async findOneByProduct(productId: number) {
+  async findOneByProduct(productId: number, appId: number) {
     if (!productId) {
       return null;
     }
-    const stock = await this.repo.findOne({ where: { product: { id: productId } } });
+    const stock = await this.repo.findOne({ where: { product: { id: productId, application: { id: appId } } } });
     return stock;
   }
 
-  async updateQuantity(productId: number, quantity: number) {
-    const stock = await this.findOneByProduct(productId);
+  async updateQuantity(productId: number, quantity: number, appId: number) {
+    const stock = await this.findOneByProduct(productId, appId);
     if (!stock) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_STOCK);
     }
     stock.quantity = quantity;
+    return this.repo.save(stock);
+  }
+
+  async update(id: number, appId: number, stockData: UpdateStockDto) {
+    const stock = await this.repo.findOne({ where: { id, product: { application: { id: appId } } } });
+    if (!stock) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_STOCK);
+    }
+    Object.assign(stock, stockData);
     return this.repo.save(stock);
   }
 }

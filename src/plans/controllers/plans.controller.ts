@@ -25,9 +25,9 @@ export class PlansController {
 
   @UseGuards(AuthenticationGuard)
   @Post('/stock/:id')
-  async transferToStock(@Param('id') id: string) {
-    console.log('----------> stock', id);
-    const plan = await this.plansService.transferToStock(parseInt(id));
+  async transferToStock(@Param('id') id: string, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    const plan = await this.plansService.transferToStock(parseInt(id), appId);
     return plan;
   }
 
