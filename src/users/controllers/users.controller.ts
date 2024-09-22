@@ -11,24 +11,24 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from '../services/users.service';
+import { CreateUserDto } from 'src/auth/dtos/create-user.dto';
+import { MSG_EXCEPTION } from 'src/common/constants/messages';
+import { PermissionType } from 'src/common/constants/permissions';
+import { RoleType } from 'src/common/constants/roles';
+import { GetUser } from 'src/common/decorators/getUser.decorator';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { AuthenticationGuard } from 'src/common/guards/authentication.guard';
 import { AuthorizationGuard } from 'src/common/guards/authorization.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { RoleType } from 'src/common/constants/roles';
-import { Permissions } from 'src/common/decorators/permissions.decorator';
-import { PermissionType } from 'src/common/constants/permissions';
-import { MSG_EXCEPTION } from 'src/common/constants/messages';
-import { CreateUserDto } from 'src/auth/dtos/create-user.dto';
-import { UpdateUserDto } from '../dtos/update-user.dto';
-import { AccountType, User } from '../entities/user.entity';
+import getApplicationId from 'src/common/helpers/application-id.func';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { CreateUserAccountDto } from '../dtos/create-user-account.dto';
-import { UpgradeUserDto } from '../dtos/upgrade-user.dto';
-import { GetUser } from 'src/common/decorators/getUser.decorator';
-import { StaffDto } from '../dtos/staff.dto';
 import { UpdateStaffDto } from '../dtos/update-staff.dto';
-import getApplicationId from 'src/common/helpers/application-id.func';
+import { UpdateUserExposeDto } from '../dtos/update-user-expose.dto';
+import { UpdateUserDto } from '../dtos/update-user.dto';
+import { UpgradeUserDto } from '../dtos/upgrade-user.dto';
+import { AccountType, User } from '../entities/user.entity';
+import { UsersService } from '../services/users.service';
 
 @Controller('users')
 export class UsersController {
@@ -47,6 +47,7 @@ export class UsersController {
     return user;
   }
 
+  @Serialize(UpdateUserExposeDto)
   @UseGuards(AuthenticationGuard)
   @Patch()
   async updateUserSelfAccount(@Body() userData: UpdateUserDto, @GetUser() user: Partial<User>) {
