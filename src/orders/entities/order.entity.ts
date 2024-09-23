@@ -13,6 +13,7 @@ import {
 } from 'typeorm';
 import { ProductToOrder } from './product_order.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
+import { Plan } from 'src/plans/entities/plan.entity';
 
 export enum OrderStatus {
   Draft = 'Draft',
@@ -54,8 +55,14 @@ export class Order {
   @Column('boolean', { default: false })
   isHidden: boolean;
 
+  @Column('boolean', { default: false })
+  subProductStock: boolean;
+
   @OneToMany(() => ProductToOrder, (productToOrder) => productToOrder.order)
   productToOrder!: ProductToOrder[];
+
+  @OneToMany(() => Plan, (plan) => plan.order)
+  plans: Plan[];
 
   @ManyToOne(() => Customer, (customer) => customer.orders)
   customer: Customer;
@@ -66,7 +73,7 @@ export class Order {
   @ManyToOne(() => Application, (application) => application.orders)
   application: Application;
 
-  @OneToMany(() => Payment, (payment) => payment.order)
+  @OneToMany(() => Payment, (payment) => payment.order, { cascade: true, onDelete: 'CASCADE' })
   payments: Payment[];
 
   @CreateDateColumn()

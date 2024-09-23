@@ -8,6 +8,7 @@ import { CreateStockDto } from '../dtos/create-stock.dto';
 import { Stock } from '../entities/stock.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { UpdateStockDto } from '../dtos/update-stock.dto';
+import { Order } from 'src/orders/entities/order.entity';
 
 @Injectable()
 export class StockService {
@@ -94,5 +95,16 @@ export class StockService {
     }
     Object.assign(stock, stockData);
     return this.repo.save(stock);
+  }
+
+  async updateFromOrder(order: Order, appId: number) {
+    const { productToOrder } = order;
+    for (const product of productToOrder) {
+      const stock = await this.findOneByProduct(product.productId, appId);
+      stock.quantity -= product.quantity;
+      await this.repo.save(stock);
+    }
+    order.subProductStock = true;
+    return order;
   }
 }

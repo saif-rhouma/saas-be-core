@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Application } from 'src/applications/entities/application.entity';
+import { Order } from 'src/orders/entities/order.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Supplying } from 'src/stock/entities/supplying.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -48,6 +49,9 @@ export class Plan {
 
   @ManyToOne(() => Product, (product) => product.plans)
   product: Product;
+
+  @ManyToOne(() => Order, (order) => order.plans)
+  order: Order;
 
   @OneToOne(() => Supplying, (supplying) => supplying.plan)
   supplying: Supplying;

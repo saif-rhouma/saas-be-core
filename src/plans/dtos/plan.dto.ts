@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Expose, Transform } from 'class-transformer';
-import { PlanStatus } from '../entities/plan.entity';
 import { Product } from 'src/products/entities/product.entity';
+import { PlanStatus } from '../entities/plan.entity';
 
 export class PlanDto {
   @Expose()

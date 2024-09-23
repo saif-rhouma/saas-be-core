@@ -44,7 +44,7 @@ export class Payment {
   @ManyToOne(() => Customer, (customer) => customer.payments)
   customer: Customer;
 
-  @ManyToOne(() => Order, (order) => order.payments)
+  @ManyToOne(() => Order, (order) => order.payments, { onDelete: 'CASCADE' })
   order: Order;
 
   @ManyToOne(() => User, (user) => user.payments)

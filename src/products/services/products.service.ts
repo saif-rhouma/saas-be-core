@@ -71,7 +71,10 @@ export class ProductService {
   }
 
   findAll(appId: number) {
-    return this.repo.find({ where: { application: { id: appId } }, relations: { stock: true } });
+    return this.repo.find({
+      where: { application: { id: appId } },
+      relations: { stock: true, productToOrder: { order: true } },
+    });
   }
 
   findAllStock(appId: number) {

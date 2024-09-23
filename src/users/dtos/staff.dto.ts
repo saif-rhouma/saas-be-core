@@ -18,4 +18,11 @@ export class StaffDto {
 
   @Expose()
   isActive: boolean;
+
+  @Expose()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @Transform(({ value, obj }) =>
+    obj.permissions.map((permission) => ({ name: permission.name, slug: permission.slug })),
+  )
+  permissions: any[];
 }

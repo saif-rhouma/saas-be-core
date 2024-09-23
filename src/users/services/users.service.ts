@@ -10,6 +10,8 @@ import { PermissionsService } from './permissions.service';
 import { hashPassword } from 'src/common/helpers/hash-password.func';
 import { RoleType } from 'src/common/constants/roles';
 import { ApplicationsService } from 'src/applications/services/applications.service';
+import { CreateStaffDto } from 'src/auth/dtos/create-staff.dto';
+import { UpdateStaffDto } from '../dtos/update-staff.dto';
 
 @Injectable()
 export class UsersService {
@@ -42,7 +44,7 @@ export class UsersService {
     return this.repo.save(user);
   }
 
-  async createStaff(staffData: Partial<CreateUserDto>, applicationId: number) {
+  async createStaff(staffData: Partial<CreateStaffDto>, applicationId: number) {
     const users = await this.find(staffData.email);
     if (users.length) {
       // throw Exception !!!
@@ -75,6 +77,18 @@ export class UsersService {
       user.applications.push(application);
     } else {
       user.applications = [application];
+    }
+
+    for (const permissionSlug of staffData.permissions) {
+      const [permission] = await this.permissionsService.findBySlug(permissionSlug);
+      if (!permission) {
+        throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PERMISSION);
+      }
+      if (user.permissions) {
+        user.permissions.push(permission);
+      } else {
+        user.permissions = [permission];
+      }
     }
 
     return this.repo.save(user);
@@ -128,6 +142,20 @@ export class UsersService {
     return user;
   }
 
+  async findOneByApplication(id: number, appId: number) {
+    if (!id || !appId) {
+      return null;
+    }
+    const staff = await this.repo.findOne({
+      where: { id, applications: { id: appId }, roles: { name: RoleType.STAFF } },
+      relations: ['permissions'],
+    });
+    if (!staff) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);
+    }
+    return staff;
+  }
+
   find(email: string) {
     return this.repo.find({ where: { email }, relations: { roles: true, userOwnedApps: true, applications: true } });
   }
@@ -143,7 +171,6 @@ export class UsersService {
     if (!users) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);
     }
-    console.log('---> findAllStaffByApplication');
     return users;
   }
 
@@ -157,6 +184,34 @@ export class UsersService {
       attrs.password = hashedPassword;
     }
     Object.assign(user, attrs);
+    return this.repo.save(user);
+  }
+
+  async updateStaff(id: number, attrs: Partial<UpdateStaffDto>) {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);
+    }
+    if (attrs.password) {
+      const hashedPassword = await hashPassword(attrs.password);
+      attrs.password = hashedPassword;
+    }
+    Object.assign(user, attrs);
+
+    if (attrs.permissions) {
+      user.permissions = [];
+      for (const permissionSlug of attrs.permissions) {
+        const [permission] = await this.permissionsService.findBySlug(permissionSlug);
+        if (!permission) {
+          throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PERMISSION);
+        }
+        if (user.permissions) {
+          user.permissions.push(permission);
+        } else {
+          user.permissions = [permission];
+        }
+      }
+    }
     return this.repo.save(user);
   }
 
@@ -175,6 +230,17 @@ export class UsersService {
       throw new NotFoundException('user not found');
     }
     return this.repo.remove(user);
+  }
+
+  async removeStaff(id: number, appId: number) {
+    if (!id || !appId) {
+      return null;
+    }
+    const staff = await this.findOneByApplication(id, appId);
+    if (!staff) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);
+    }
+    return this.repo.remove(staff);
   }
 
   async hasPermission(id: number, slugs: string[]) {

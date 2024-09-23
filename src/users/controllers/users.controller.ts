@@ -29,6 +29,9 @@ import { UpdateUserDto } from '../dtos/update-user.dto';
 import { UpgradeUserDto } from '../dtos/upgrade-user.dto';
 import { AccountType, User } from '../entities/user.entity';
 import { UsersService } from '../services/users.service';
+import { CreateStaffDto } from 'src/auth/dtos/create-staff.dto';
+import { StaffDto } from '../dtos/staff.dto';
+import { StaffListDto } from '../dtos/staff-list.dto';
 
 @Controller('users')
 export class UsersController {
@@ -56,9 +59,9 @@ export class UsersController {
   }
 
   @UseGuards(AuthenticationGuard)
-  @Patch('staff')
-  async updateStaffAccount(@Body() userData: UpdateStaffDto) {
-    const res = await this.usersService.update(userData.id, userData);
+  @Patch('staff/:id')
+  async updateStaffAccount(@Param('id') id: string, @Body() userData: UpdateStaffDto) {
+    const res = await this.usersService.updateStaff(parseInt(id), userData);
     return res;
   }
 
@@ -73,19 +76,39 @@ export class UsersController {
   @Serialize(CreateUserAccountDto)
   @UseGuards(AuthenticationGuard)
   @Post('staff')
-  async createStaff(@Body() userData: CreateUserDto, @GetUser() user: Partial<User>) {
+  async createStaff(@Body() userData: CreateStaffDto, @GetUser() user: Partial<User>) {
     const appId = getApplicationId(user);
     const staff = await this.usersService.createStaff(userData, appId);
     return staff;
   }
 
-  // @Serialize(StaffDto)
+  @Serialize(StaffDto)
+  @UseGuards(AuthenticationGuard)
+  @Delete('/staff/:id')
+  removeStaff(@Param('id') id: string, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    return this.usersService.removeStaff(parseInt(id), appId);
+  }
+
+  @Serialize(StaffListDto)
   @UseGuards(AuthenticationGuard)
   @Get('staff')
   async findAllStaff(@GetUser() user: Partial<User>) {
     const appId = getApplicationId(user);
     const staffs = await this.usersService.findAllStaffByApplication(appId);
     return staffs;
+  }
+
+  @Serialize(StaffDto)
+  @UseGuards(AuthenticationGuard)
+  @Get('/staff/:id')
+  async findStaff(@Param('id') id: string, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    const staff = await this.usersService.findOneByApplication(parseInt(id), appId);
+    if (!staff) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);
+    }
+    return staff;
   }
 
   //! Protected Route By Authentication [WILL BE DELETED]
@@ -111,6 +134,7 @@ export class UsersController {
     return 'Hello There!!!';
   }
 
+  // @Serialize(StaffDto)
   @Get('/:id')
   async findUser(@Param('id') id: string) {
     const user = await this.usersService.findOne(parseInt(id));

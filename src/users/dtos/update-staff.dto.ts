@@ -1,11 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { IsBoolean, IsEmail, IsJSON, IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsArray, IsBoolean, IsEmail, IsJSON, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateStaffDto {
-  @IsNumber()
-  @IsNotEmpty()
-  id: number;
-
   @IsEmail()
   @IsOptional()
   email: string;
@@ -34,4 +30,8 @@ export class UpdateStaffDto {
   @IsString()
   @IsOptional()
   avatar: string;
+
+  @IsOptional()
+  @IsArray()
+  permissions: any[];
 }

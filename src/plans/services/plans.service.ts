@@ -8,6 +8,7 @@ import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import { Plan, PlanStatus } from '../entities/plan.entity';
 import { StockService } from 'src/stock/services/stock.service';
+import { Order } from 'src/orders/entities/order.entity';
 
 @Injectable()
 export class PlansService {
@@ -21,7 +22,13 @@ export class PlansService {
     // private supplyingService: SupplyingService,
   ) {}
 
-  async createPlan(planData: Partial<Plan>, userId: number, productId: number, applicationId: number) {
+  async createPlan(
+    planData: Partial<Plan>,
+    userId: number,
+    productId: number,
+    applicationId: number,
+    order: Order = undefined,
+  ) {
     const plan = this.repo.create({ ...planData });
     if (!userId) {
       return null;
@@ -39,6 +46,10 @@ export class PlansService {
     const application = await this.applicationsService.findOne(applicationId);
     if (!application) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_APPLICATION);
+    }
+
+    if (order) {
+      plan.order = order;
     }
 
     plan.createdBy = user;
@@ -68,7 +79,7 @@ export class PlansService {
     }
     const plan = this.repo.find({
       where: { application: { id: appId } },
-      relations: { product: true, createdBy: true },
+      relations: { product: true, createdBy: true, order: true },
     });
     if (!plan) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PLAN);
@@ -80,7 +91,10 @@ export class PlansService {
     if (!id || !appId) {
       return null;
     }
-    const plan = await this.repo.findOne({ where: { id, application: { id: appId } }, relations: { product: true } });
+    const plan = await this.repo.findOne({
+      where: { id, application: { id: appId } },
+      relations: { product: true, order: true },
+    });
     if (!plan) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PLAN);
     }

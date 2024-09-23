@@ -10,9 +10,9 @@ import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { UpdateOrderDto } from '../dtos/update-order.dto';
 import getApplicationId from 'src/common/helpers/application-id.func';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { RoleType } from 'src/common/constants/roles';
-import { AuthorizationGuard } from 'src/common/guards/authorization.guard';
+// import { Roles } from 'src/common/decorators/roles.decorator';
+// import { RoleType } from 'src/common/constants/roles';
+// import { AuthorizationGuard } from 'src/common/guards/authorization.guard';
 import { OrderStatus } from '../entities/order.entity';
 
 @Controller('orders')
@@ -31,18 +31,44 @@ export class OrdersController {
   @Get()
   async findAll(@GetUser() user: Partial<User>) {
     const appId = getApplicationId(user);
-    const plans = await this.ordersService.findAllByApplication(appId);
-    if (!plans) {
+    const orders = await this.ordersService.findAllByApplication(appId);
+    if (!orders) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_ORDER);
     }
-    return plans;
+    return orders;
   }
 
   @UseGuards(AuthenticationGuard)
   @Get('/approve/:id')
   async approve(@Param('id') id: string, @GetUser() user: Partial<User>) {
     const appId = getApplicationId(user);
-    const order = await this.ordersService.update(parseInt(id), appId, { status: OrderStatus.InProcess });
+    const order = await this.ordersService.detailsApprove(parseInt(id), appId);
+    const outOfStock = [];
+    const { productToOrder } = order;
+    for (const ordProd of productToOrder) {
+      const stockQuantity = ordProd.product.stock?.quantity || 0;
+      if (ordProd.quantity > stockQuantity) {
+        const data = {
+          orderId: order.id,
+          product: ordProd.product,
+          missingQuantity: stockQuantity - ordProd.quantity,
+        };
+        outOfStock.push(data);
+      }
+    }
+    if (outOfStock.length === 0) {
+      const order = await this.ordersService.update(parseInt(id), appId, { status: OrderStatus.InProcess });
+      return order;
+    } else {
+      return outOfStock;
+    }
+  }
+
+  @UseGuards(AuthenticationGuard)
+  @Post('/approve/plans/')
+  async approveConfirm(@Body() payload: any, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    const order = await this.ordersService.approveAndCreatePlans(payload, user.id, appId);
     return order;
   }
 

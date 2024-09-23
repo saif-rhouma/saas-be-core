@@ -16,6 +16,8 @@ import { CustomersModule } from 'src/customers/customers.module';
 import { ApplicationsModule } from 'src/applications/applications.module';
 import { ProductOrderService } from './services/product-order.service';
 import { OrdersStatusController } from './controllers/orders-status.controller';
+import { StockModule } from 'src/stock/stock.module';
+import { PlansModule } from 'src/plans/plans.module';
 
 @Module({
   controllers: [OrdersController, OrdersStatusController],
@@ -25,6 +27,8 @@ import { OrdersStatusController } from './controllers/orders-status.controller';
     CustomersModule,
     ProductsModule,
     ApplicationsModule,
+    PlansModule,
+    StockModule,
     TypeOrmModule.forFeature([Plan, User, Application, Customer, Product, Order, ProductToOrder]),
   ],
   exports: [OrdersService],
