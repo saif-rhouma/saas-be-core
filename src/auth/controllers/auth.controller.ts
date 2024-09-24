@@ -15,6 +15,7 @@ import { UserMeDto } from '../dtos/user-me.dto';
 import getApplicationId from 'src/common/helpers/application-id.func';
 import { ApplicationsService } from 'src/applications/services/applications.service';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
+import { PermissionsService } from 'src/users/services/permissions.service';
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +23,7 @@ export class AuthController {
     private authService: AuthService,
     private usersService: UsersService,
     private applicationsService: ApplicationsService,
+    private permissionsService: PermissionsService,
   ) {}
   @Serialize(UserDto)
   @Post('/signup')
@@ -43,6 +45,15 @@ export class AuthController {
   async authMe(@GetUser() user: Partial<User>) {
     const [userData] = await this.usersService.find(user.email);
     return userData;
+  }
+
+  // @Serialize(UserDto)
+  @HttpCode(HTTP_CODE.OK)
+  @UseGuards(AuthenticationGuard)
+  @Get('/permissions')
+  async userPermissions(@GetUser() user: Partial<User>) {
+    const permissions = await this.permissionsService.findByUser(user.id);
+    return permissions.map((per) => per.slug);
   }
 
   @UseGuards(AuthenticationGuard)

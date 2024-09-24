@@ -26,51 +26,44 @@ export class AuthService {
   ) {}
 
   async signup(userData) {
-    try {
-      const users = await this.usersService.find(userData.email);
-      if (users.length) {
-        // throw Exception !!!
-        throw new BadRequestException(MSG_EXCEPTION.OTHER_ALREADY_IN_USE_EMAIL);
-      }
-      // Hash the users password
-      const result = await hashPassword(userData.password);
-      delete userData.password;
-      // Create a new user and save it
-      const user = await this.usersService.createUser({
-        ...userData,
-        password: result,
-        role: RoleType.USER,
-      });
-      return user;
-    } catch (error) {}
+    const users = await this.usersService.find(userData.email);
+    if (users.length) {
+      // throw Exception !!!
+      throw new BadRequestException(MSG_EXCEPTION.OTHER_ALREADY_IN_USE_EMAIL);
+    }
+    // Hash the users password
+    const result = await hashPassword(userData.password);
+    delete userData.password;
+    // Create a new user and save it
+    const user = await this.usersService.createUser({
+      ...userData,
+      password: result,
+      role: RoleType.USER,
+    });
+    return user;
   }
 
   async login(email: string, password: string) {
-    try {
-      const [user] = await this.usersService.find(email);
-      if (!user) {
-        throw new UnauthorizedException(MSG_EXCEPTION.NOT_FOUND_USER);
-      }
+    const [user] = await this.usersService.find(email);
+    if (!user) {
+      throw new UnauthorizedException(MSG_EXCEPTION.NOT_FOUND_USER);
+    }
+    const [salt, storedHash] = user.password.split('.');
+    const hash = (await scrypt(password, salt, 32)) as Buffer;
 
-      const [salt, storedHash] = user.password.split('.');
-      const hash = (await scrypt(password, salt, 32)) as Buffer;
-
-      if (hash.toString('hex') !== storedHash) {
-        throw new UnauthorizedException(MSG_EXCEPTION.OTHER_BAD_PASSWORD);
-      }
-      // Serialize User For Token
-      const userPlain = instanceToPlain(user);
-      const userToken = plainToInstance(UserTokenDto, userPlain, { excludeExtraneousValues: true });
-      const { accessToken, refreshToken } = await this.generateUserTokens(userToken);
-      await this.storeRefreshToken(refreshToken, user);
-      return { ...user, accessToken, refreshToken };
-    } catch (error) {}
+    if (hash.toString('hex') !== storedHash) {
+      throw new UnauthorizedException(MSG_EXCEPTION.OTHER_BAD_PASSWORD);
+    }
+    // Serialize User For Token
+    const userPlain = instanceToPlain(user);
+    const userToken = plainToInstance(UserTokenDto, userPlain, { excludeExtraneousValues: true });
+    const { accessToken, refreshToken } = await this.generateUserTokens(userToken);
+    await this.storeRefreshToken(refreshToken, user);
+    return { ...user, accessToken, refreshToken };
   }
 
   async logout(refreshToken: string) {
-    try {
-      return this.tokenService.remove(refreshToken);
-    } catch (error) {}
+    return this.tokenService.remove(refreshToken);
   }
 
   async generateUserTokens(user) {
@@ -81,22 +74,20 @@ export class AuthService {
   }
 
   async refreshTokens(refreshToken: string) {
-    try {
-      if (refreshToken == null) {
-        throw new UnauthorizedException();
-      }
-      const token = await this.tokenService.findOne(refreshToken);
+    if (refreshToken == null) {
+      throw new UnauthorizedException();
+    }
+    const token = await this.tokenService.findOne(refreshToken);
 
-      if (!token) {
-        throw new UnauthorizedException();
-      }
-      const { user } = await this.jwtService.verify(refreshToken, {
-        secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
-      });
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+    const { user } = await this.jwtService.verify(refreshToken, {
+      secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
+    });
 
-      const { accessToken } = await this.generateUserTokens(user);
-      return { accessToken };
-    } catch (error) {}
+    const { accessToken } = await this.generateUserTokens(user);
+    return { accessToken };
   }
 
   async storeRefreshToken(refreshToken, user) {

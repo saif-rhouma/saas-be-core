@@ -42,6 +42,26 @@ export class UserDto {
   userOwnedApps;
 
   @Expose()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @Transform(({ value, obj }) => {
+    try {
+      return Object.assign(
+        {},
+        ...obj.applications?.map((app) => {
+          return {
+            id: app?.id,
+            name: app?.name,
+            currencySymbol: app?.currencySymbol,
+          };
+        }),
+      );
+    } catch (error) {
+      return Object.assign({});
+    }
+  })
+  applications;
+
+  @Expose()
   phoneNumber: string;
 
   @Expose()

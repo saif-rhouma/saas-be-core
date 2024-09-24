@@ -21,6 +21,6 @@ import { ApplicationsModule } from 'src/applications/applications.module';
     forwardRef(() => ApplicationsModule),
     TypeOrmModule.forFeature([User, RefreshToken, Role, Permission, Application]),
   ],
-  exports: [UsersService, RolesService],
+  exports: [UsersService, RolesService, PermissionsService],
 })
 export class UsersModule {}
