@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Type } from 'class-transformer';
-import { IsBoolean, IsDate, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateOrderDto {
   @IsDate()
@@ -15,6 +15,10 @@ export class UpdateOrderDto {
   @IsString()
   @IsOptional()
   status: string;
+
+  @IsNumber()
+  @IsOptional()
+  discount: number;
 
   @IsDate()
   @IsOptional()

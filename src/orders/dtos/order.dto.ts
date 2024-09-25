@@ -16,6 +16,9 @@ export class OrderDto {
   isHidden: boolean;
 
   @Expose()
+  discount: number;
+
+  @Expose()
   deliveryDate: Date;
 
   @Expose()

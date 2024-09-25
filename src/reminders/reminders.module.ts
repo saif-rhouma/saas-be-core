@@ -7,10 +7,18 @@ import { User } from 'src/users/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApplicationsModule } from 'src/applications/applications.module';
 import { UsersModule } from 'src/users/users.module';
+import { ReminderSubscriber } from './subscribers/reminder.subscriber';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
-  providers: [RemindersService],
+  providers: [RemindersService, ReminderSubscriber],
   controllers: [RemindersController],
-  imports: [UsersModule, ApplicationsModule, TypeOrmModule.forFeature([User, Application, Reminder])],
+  imports: [
+    UsersModule,
+    ApplicationsModule,
+    TypeOrmModule.forFeature([User, Application, Reminder]),
+    NotificationsModule,
+  ],
+  exports: [RemindersService],
 })
 export class RemindersModule {}

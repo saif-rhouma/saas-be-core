@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Application } from 'src/applications/entities/application.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
@@ -19,6 +20,12 @@ export class Reminder {
     nullable: true,
   })
   description: string;
+
+  @Column({
+    nullable: true,
+    default: true,
+  })
+  isNotified: boolean;
 
   @Column({
     nullable: true,

@@ -71,6 +71,7 @@ export class OrdersService {
     order.application = application;
     order.createdBy = user;
     order.customer = customer;
+    order.discount = orderData.discount;
     order.totalOrderAmount = totalAmount;
 
     const preOrder = this.repo.create({ ...order });
@@ -115,7 +116,7 @@ export class OrdersService {
     }
     const order = await this.repo.findOne({
       where: { id, application: { id: appId } },
-      relations: ['productToOrder', 'productToOrder.product', 'customer', 'payments'],
+      relations: ['productToOrder', 'productToOrder.product', 'customer', 'payments', 'application'],
     });
     if (!order) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_ORDER);

@@ -74,6 +74,7 @@ export class Application {
 
   @Column({
     nullable: true,
+    default: 0,
   })
   taxPercentage: number;
 

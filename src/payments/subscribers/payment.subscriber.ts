@@ -1,7 +1,8 @@
-import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent } from 'typeorm';
-import { Payment } from '../entities/payment.entity';
+/* eslint-disable prettier/prettier */
 import { Inject } from '@nestjs/common';
 import { OrdersService } from 'src/orders/services/orders.service';
+import { DataSource, EntitySubscriberInterface, EventSubscriber, UpdateEvent } from 'typeorm';
+import { Payment } from '../entities/payment.entity';
 
 @EventSubscriber()
 export class PaymentSubscriber implements EntitySubscriberInterface<Payment> {

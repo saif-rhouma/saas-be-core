@@ -44,6 +44,7 @@ import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { join } from 'path';
 import { SeedersModule } from './seeders/seeders.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -127,6 +128,7 @@ import { SeedersModule } from './seeders/seeders.module';
     FinancialModule,
     AnalyticsModule,
     SeedersModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

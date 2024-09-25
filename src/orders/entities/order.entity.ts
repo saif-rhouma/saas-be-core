@@ -49,6 +49,12 @@ export class Order {
   })
   totalOrderAmount: number;
 
+  @Column({
+    nullable: true,
+    default: 0,
+  })
+  discount: number;
+
   @Column('text', { default: OrderStatus.Draft })
   status: OrderStatus;
 

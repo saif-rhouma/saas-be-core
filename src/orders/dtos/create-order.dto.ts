@@ -15,6 +15,9 @@ export class CreateOrderDto {
   @IsNumber()
   customer: number;
 
+  @IsNumber()
+  discount: number;
+
   @IsArray()
   products: ProductQty[];
 }

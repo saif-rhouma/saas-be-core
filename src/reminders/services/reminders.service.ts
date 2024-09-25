@@ -1,12 +1,13 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Reminder } from '../entities/reminder.entity';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersService } from 'src/users/services/users.service';
 import { ApplicationsService } from 'src/applications/services/applications.service';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
+import { UsersService } from 'src/users/services/users.service';
+import { Repository } from 'typeorm';
 import { CreateReminderDto } from '../dtos/create-reminder.dto';
 import { UpdateReminderDto } from '../dtos/update-reminder.dto';
+import { Reminder } from '../entities/reminder.entity';
 
 @Injectable()
 export class RemindersService {
@@ -49,6 +50,10 @@ export class RemindersService {
     return reminders;
   }
 
+  findAll() {
+    return this.repo.find();
+  }
+
   async findOneByApplication(id: number, appId: number) {
     if (!id || !appId) {
       return null;
@@ -76,6 +81,15 @@ export class RemindersService {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_REMINDER);
     }
     Object.assign(reminder, reminderData);
+    return this.repo.save(reminder);
+  }
+
+  async isNotifiedChange(id: number, notifyValue: boolean) {
+    const reminder = await this.findOne(id);
+    if (!reminder) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_REMINDER);
+    }
+    Object.assign(reminder, { isNotified: notifyValue });
     return this.repo.save(reminder);
   }
 
