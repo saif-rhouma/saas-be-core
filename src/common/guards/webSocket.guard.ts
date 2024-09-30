@@ -20,6 +20,7 @@ export class WebSocketGuard implements CanActivate {
 
   static validateToken(client: Socket) {
     const { authorization } = client.handshake.auth;
+
     const token = authorization.split(' ')[1];
 
     if (!token) {
