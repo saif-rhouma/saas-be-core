@@ -9,6 +9,9 @@ export class CustomerDto {
   email: string;
 
   @Expose()
+  ref: string;
+
+  @Expose()
   isActive: boolean;
 
   @Expose()

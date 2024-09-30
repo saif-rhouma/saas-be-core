@@ -8,9 +8,10 @@ import { Application } from 'src/applications/entities/application.entity';
 import { Customer } from './entities/customer.entity';
 import { UsersModule } from 'src/users/users.module';
 import { ApplicationsModule } from 'src/applications/applications.module';
+import { CustomerSubscriber } from './subscribers/customer.subscriber';
 
 @Module({
-  providers: [CustomersService],
+  providers: [CustomersService, CustomerSubscriber],
   controllers: [CustomersController],
   imports: [UsersModule, ApplicationsModule, TypeOrmModule.forFeature([Plan, User, Application, Customer])],
   exports: [CustomersService],

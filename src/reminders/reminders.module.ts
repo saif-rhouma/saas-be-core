@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { RemindersService } from './services/reminders.service';
 import { RemindersController } from './controllers/reminders.controller';
 import { Reminder } from './entities/reminder.entity';
@@ -17,7 +17,7 @@ import { NotificationsModule } from 'src/notifications/notifications.module';
     UsersModule,
     ApplicationsModule,
     TypeOrmModule.forFeature([User, Application, Reminder]),
-    NotificationsModule,
+    forwardRef(() => NotificationsModule),
   ],
   exports: [RemindersService],
 })

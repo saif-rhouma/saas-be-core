@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TicketsController } from './controllers/tickets.controller';
 import { TicketsService } from './services/tickets.service';
 import { UsersModule } from 'src/users/users.module';
@@ -11,15 +11,18 @@ import { TicketMessage } from './entities/ticket-message.entity';
 import { TicketMessagesService } from './services/ticket-messages.service';
 import { TicketMessagesController } from './controllers/ticket-messages.controller';
 import { NotificationsModule } from 'src/notifications/notifications.module';
+import { TicketSubscriber } from './subscribers/ticket.subscriber';
 
 @Module({
   controllers: [TicketsController, TicketMessagesController],
-  providers: [TicketsService, TicketMessagesService],
+  providers: [TicketsService, TicketMessagesService, TicketSubscriber],
   imports: [
     UsersModule,
     ApplicationsModule,
-    NotificationsModule,
+    // NotificationsModule,
+    forwardRef(() => NotificationsModule),
     TypeOrmModule.forFeature([User, Application, Ticket, TicketMessage]),
   ],
+  exports: [TicketsService],
 })
 export class TicketsModule {}

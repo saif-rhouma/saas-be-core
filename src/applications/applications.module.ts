@@ -11,7 +11,6 @@ import { Plan } from 'src/plans/entities/plan.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { ProductAddon } from 'src/products/entities/product-addon.entity';
 import { FinancialModule } from 'src/financial/financial.module';
-import { Financial } from 'src/financial/entities/financial-year.entity';
 @Module({
   controllers: [ApplicationsController],
   imports: [

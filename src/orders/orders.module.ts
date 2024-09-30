@@ -18,10 +18,11 @@ import { ProductOrderService } from './services/product-order.service';
 import { OrdersStatusController } from './controllers/orders-status.controller';
 import { StockModule } from 'src/stock/stock.module';
 import { PlansModule } from 'src/plans/plans.module';
+import { OrderSubscriber } from './subscribers/order.subscriber';
 
 @Module({
   controllers: [OrdersController, OrdersStatusController],
-  providers: [OrdersService, ProductOrderService],
+  providers: [OrdersService, ProductOrderService, OrderSubscriber],
   imports: [
     UsersModule,
     CustomersModule,

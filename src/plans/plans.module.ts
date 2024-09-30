@@ -11,10 +11,11 @@ import { Application } from 'src/applications/entities/application.entity';
 import { ApplicationsModule } from 'src/applications/applications.module';
 import { PlansStatusController } from './controllers/plans-status.controller';
 import { StockModule } from 'src/stock/stock.module';
+import { PlanSubscriber } from './subscribers/plan.subscriber';
 
 @Module({
   controllers: [PlansController, PlansStatusController],
-  providers: [PlansService],
+  providers: [PlansService, PlanSubscriber],
   imports: [
     UsersModule,
     ApplicationsModule,

@@ -12,7 +12,7 @@ import { CreateOrderDto } from '../dtos/create-order.dto';
 import { UpdateOrderDto } from '../dtos/update-order.dto';
 import { Order, OrderStatus } from '../entities/order.entity';
 import { ProductOrderService } from './product-order.service';
-import { StockService } from 'src/stock/services/stock.service';
+import { Operation, StockService } from 'src/stock/services/stock.service';
 import { PlansService } from 'src/plans/services/plans.service';
 import { Plan } from 'src/plans/entities/plan.entity';
 
@@ -172,24 +172,39 @@ export class OrdersService {
 
   async updateStatus(id: number, appId: number, attrs: Partial<UpdateOrderDto>) {
     const order = await this.findOneByApplication(id, appId);
+    const prevStatus = order.status;
     Object.assign(order, attrs);
     if (order.status === OrderStatus.Delivered && !order.subProductStock) {
       const res = await this.stockService.updateFromOrder(order, appId);
+      Object.assign(order, res);
+    } else if (prevStatus === OrderStatus.Delivered && order.subProductStock) {
+      const res = await this.stockService.updateFromOrder(order, appId, Operation.ADD);
       Object.assign(order, res);
     }
     return this.repo.save(order);
   }
 
+  // async remove(id: number, appId: number) {
+  //   if (!id || !appId) {
+  //     return null;
+  //   }
+  //   const order = await this.findOneByApplication(id, appId);
+  //   if (!order) {
+  //     throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_ORDER);
+  //   }
+  //   await this.productOrderService.remove(id);
+  //   return this.repo.remove(order);
+  // }
+
   async remove(id: number, appId: number) {
     if (!id || !appId) {
       return null;
     }
-    await this.productOrderService.remove(id);
     const order = await this.findOneByApplication(id, appId);
     if (!order) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_ORDER);
     }
-    return this.repo.remove(order);
+    return this.update(id, appId, { status: OrderStatus.Canceled });
   }
 
   async addAmount(order: Order, amount: number) {

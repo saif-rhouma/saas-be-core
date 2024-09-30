@@ -19,6 +19,11 @@ export class Customer {
   id: number;
 
   @Column({
+    nullable: true,
+  })
+  ref: string;
+
+  @Column({
     nullable: false,
   })
   name: string;

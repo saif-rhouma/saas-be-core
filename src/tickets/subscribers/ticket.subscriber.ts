@@ -1,16 +1,16 @@
 /* eslint-disable prettier/prettier */
-import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent } from 'typeorm';
-import { Ticket, TicketStatus } from '../entities/ticket.entity';
-import { NotificationsService } from 'src/notifications/services/notifications.service';
 import { Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NotificationType } from 'src/common/constants/notification';
+import { NotificationsGateway } from 'src/notifications/gateway/notifications.gateway';
+import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent } from 'typeorm';
+import { Ticket, TicketStatus } from '../entities/ticket.entity';
 
 @EventSubscriber()
 export class TicketSubscriber implements EntitySubscriberInterface<Ticket> {
   constructor(
     @Inject(DataSource) dataSource: DataSource,
-    private readonly notificationsService: NotificationsService,
+    private readonly notificationGateway: NotificationsGateway,
     private eventEmitter: EventEmitter2,
   ) {
     dataSource.subscribers.push(this);
@@ -24,7 +24,7 @@ export class TicketSubscriber implements EntitySubscriberInterface<Ticket> {
    * Called after entity insert.
    */
   afterInsert(event: InsertEvent<Ticket>) {
-    console.log(`A new ticket has been inserted: `, event.entity);
+    // console.log(`A new ticket has been inserted: `, event.entity);
     this.handleTicketCreation(event.entity);
   }
 
@@ -40,7 +40,7 @@ export class TicketSubscriber implements EntitySubscriberInterface<Ticket> {
 
   async handleTicketCreation(ticket: Ticket) {
     this.sendNotificationToClient(
-      ticket.createdBy.id.toString(),
+      ticket.member.id.toString(),
       `Ticket: ${ticket.topic}`,
       NotificationType.TICKET,
       ticket,
@@ -49,7 +49,7 @@ export class TicketSubscriber implements EntitySubscriberInterface<Ticket> {
 
   async handleTicketClosed(ticket) {
     this.sendNotificationToClient(
-      ticket.createdBy.id.toString(),
+      ticket.member.id.toString(),
       `Ticket: ${ticket.topic}`,
       NotificationType.TICKET,
       ticket,
@@ -57,13 +57,7 @@ export class TicketSubscriber implements EntitySubscriberInterface<Ticket> {
   }
 
   // Function to send the notification to a specific client
-  sendNotificationToClient(clientId: string, message: string, type: string, data: any) {
-    const clientSubject = this.notificationsService.getClient(clientId);
-
-    if (clientSubject) {
-      clientSubject.next({ data: { message, type, data } } as MessageEvent);
-    } else {
-      console.log(`Client with ID ${clientId} is not connected.`);
-    }
+  sendNotificationToClient(clientId: string, message: string, type: NotificationType, data: any) {
+    this.notificationGateway.handleNotificationMessage(clientId, { message, type, data });
   }
 }

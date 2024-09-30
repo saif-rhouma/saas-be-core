@@ -17,6 +17,9 @@ export class ProductToOrder {
   @Column()
   public quantity: number;
 
+  @Column({ nullable: true })
+  public discountPercentage: number;
+
   @ManyToOne(() => Product, (product) => product.productToOrder)
   public product: Product;
 

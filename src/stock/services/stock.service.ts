@@ -10,6 +10,10 @@ import { Product } from 'src/products/entities/product.entity';
 import { UpdateStockDto } from '../dtos/update-stock.dto';
 import { Order } from 'src/orders/entities/order.entity';
 
+export enum Operation {
+  ADD = 'ADD',
+  SUB = 'SUB',
+}
 @Injectable()
 export class StockService {
   constructor(
@@ -97,14 +101,20 @@ export class StockService {
     return this.repo.save(stock);
   }
 
-  async updateFromOrder(order: Order, appId: number) {
+  async updateFromOrder(order: Order, appId: number, operation: Operation = Operation.SUB) {
     const { productToOrder } = order;
     for (const product of productToOrder) {
       const stock = await this.findOneByProduct(product.productId, appId);
-      stock.quantity -= product.quantity;
+      if (operation === Operation.SUB) {
+        stock.quantity -= product.quantity;
+        order.subProductStock = true;
+      } else {
+        stock.quantity += product.quantity;
+        order.subProductStock = false;
+      }
       await this.repo.save(stock);
     }
-    order.subProductStock = true;
+
     return order;
   }
 }

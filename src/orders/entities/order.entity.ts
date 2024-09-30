@@ -1,6 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { Application } from 'src/applications/entities/application.entity';
 import { Customer } from 'src/customers/entities/customer.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
+import { Plan } from 'src/plans/entities/plan.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -12,10 +14,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ProductToOrder } from './product_order.entity';
-import { Payment } from 'src/payments/entities/payment.entity';
-import { Plan } from 'src/plans/entities/plan.entity';
 
 export enum OrderStatus {
+  Canceled = 'Canceled',
   Draft = 'Draft',
   InProcess = 'InProcess',
   Ready = 'Ready',
@@ -26,6 +27,9 @@ export enum OrderStatus {
 export class Order {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ nullable: true })
+  ref: string;
 
   @Column({
     nullable: true,
@@ -54,6 +58,12 @@ export class Order {
     default: 0,
   })
   discount: number;
+
+  @Column({
+    nullable: true,
+    default: 0,
+  })
+  snapshotTaxPercentage: number;
 
   @Column('text', { default: OrderStatus.Draft })
   status: OrderStatus;

@@ -17,6 +17,9 @@ export class PlanDto {
   quantity: number;
 
   @Expose()
+  ref: string;
+
+  @Expose()
   isHidden: boolean;
 
   @Expose()

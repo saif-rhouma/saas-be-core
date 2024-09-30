@@ -27,6 +27,9 @@ export class Plan {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  ref: string;
+
   @Column({
     nullable: true,
   })

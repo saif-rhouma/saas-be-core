@@ -62,6 +62,18 @@ export class TicketsService {
     return ticket;
   }
 
+  async getNotificationTickets(appId: number, userId: number) {
+    if (!appId) {
+      return null;
+    }
+    const tickets = this.repo.find({
+      where: { application: { id: appId }, member: { id: userId }, status: TicketStatus.Open },
+      relations: { member: true, messages: true, createdBy: true },
+    });
+
+    return tickets;
+  }
+
   async findOneByApplication(id: number, appId: number) {
     if (!id || !appId) {
       return null;
