@@ -26,6 +26,7 @@ export class WebSocketGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException(MSG_EXCEPTION.UNAUTHORIZED_TOKEN_NOT_FOUND);
     }
+
     const config = new ConfigService();
     const jwtService = new JwtService();
 
