@@ -6,11 +6,15 @@ import { NotificationType } from 'src/common/constants/notification';
 import { WebSocketGuard } from 'src/common/guards/websocket.guard';
 import { SocketAuthMiddleware } from '../middlewares/ws.auth.middleware';
 import { ServerToClientEvents } from '../types/server-to-client-events';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import getApplicationId from 'src/common/helpers/application-id.func';
 
 @WebSocketGateway({ namespace: 'api/notifications', cors: '*:*' })
 @UseGuards(WebSocketGuard)
 export class NotificationsGateway implements OnModuleInit {
   private clients: Map<string, string> = new Map();
+
+  constructor(private eventEmitter: EventEmitter2) {}
 
   private addClient(clientId: string, socketId: string) {
     this.clients.set(clientId, socketId);
@@ -33,8 +37,12 @@ export class NotificationsGateway implements OnModuleInit {
   }
   onModuleInit() {
     this.server.on('connection', (socket) => {
-      console.log(`Socket ${socket.id} Connected`);
+      console.log(`Socket ${socket.id} Connected For User : ${socket.data.user.id}`);
+      const appId = getApplicationId(socket.data.user);
+      const userId = socket.data.user.id;
+
       this.addClient(socket.data.user.id.toString(), socket.id.toString());
+      this.eventEmitter.emit('ticket-history', appId, userId);
       socket.on('disconnect', () => {
         console.log(`Socket ${socket.id} disconnected!`);
         this.removeClient(socket.data.user.id.toString());

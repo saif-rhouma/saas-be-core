@@ -1,17 +1,16 @@
 /* eslint-disable prettier/prettier */
 import { Inject } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NotificationType } from 'src/common/constants/notification';
 import { NotificationsGateway } from 'src/notifications/gateway/notifications.gateway';
 import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent } from 'typeorm';
 import { Ticket, TicketStatus } from '../entities/ticket.entity';
+import { deleteKeysFromObj } from 'src/common/helpers/delete-keys-obj';
 
 @EventSubscriber()
 export class TicketSubscriber implements EntitySubscriberInterface<Ticket> {
   constructor(
     @Inject(DataSource) dataSource: DataSource,
     private readonly notificationGateway: NotificationsGateway,
-    private eventEmitter: EventEmitter2,
   ) {
     dataSource.subscribers.push(this);
   }
@@ -32,7 +31,6 @@ export class TicketSubscriber implements EntitySubscriberInterface<Ticket> {
    * Called after entity update.
    */
   afterUpdate(event: UpdateEvent<Ticket>) {
-    console.log(`Ticket has been updated: `, event.entity);
     if (event.entity.status === TicketStatus.Closed) {
       this.handleTicketClosed(event.entity);
     }
@@ -58,6 +56,18 @@ export class TicketSubscriber implements EntitySubscriberInterface<Ticket> {
 
   // Function to send the notification to a specific client
   sendNotificationToClient(clientId: string, message: string, type: NotificationType, data: any) {
-    this.notificationGateway.handleNotificationMessage(clientId, { message, type, data });
+    const dataUpdated = deleteKeysFromObj(data, [
+      ['createdBy', 'email'],
+      ['createdBy', 'password'],
+      ['createdBy', 'accountType'],
+      ['createdBy', 'applicationThemeSetting'],
+      ['createdBy', 'isActive'],
+      ['member', 'email'],
+      ['member', 'password'],
+      ['member', 'accountType'],
+      ['member', 'applicationThemeSetting'],
+      ['member', 'isActive'],
+    ]);
+    this.notificationGateway.handleNotificationMessage(clientId, { message, type, data: dataUpdated });
   }
 }

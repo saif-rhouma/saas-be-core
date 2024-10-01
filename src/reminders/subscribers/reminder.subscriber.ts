@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 import { Inject } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CronJob } from 'cron';
 import { NotificationType } from 'src/common/constants/notification';
 import { isDateTimeInPast } from 'src/common/helpers/date-funcs';
@@ -17,7 +16,6 @@ export class ReminderSubscriber implements EntitySubscriberInterface<Reminder> {
     @Inject(DataSource) dataSource: DataSource,
     private readonly notificationGateway: NotificationsGateway,
     private readonly remindersService: RemindersService,
-    private eventEmitter: EventEmitter2,
   ) {
     dataSource.subscribers.push(this);
   }

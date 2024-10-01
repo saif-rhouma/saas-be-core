@@ -12,14 +12,15 @@ import { TicketMessagesService } from './services/ticket-messages.service';
 import { TicketMessagesController } from './controllers/ticket-messages.controller';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { TicketSubscriber } from './subscribers/ticket.subscriber';
+import { TicketsEvents } from './events/tickets.events';
+import { TicketMessageSubscriber } from './subscribers/ticket-message.subscriber';
 
 @Module({
   controllers: [TicketsController, TicketMessagesController],
-  providers: [TicketsService, TicketMessagesService, TicketSubscriber],
+  providers: [TicketsService, TicketMessagesService, TicketSubscriber, TicketMessageSubscriber, TicketsEvents],
   imports: [
     UsersModule,
     ApplicationsModule,
-    // NotificationsModule,
     forwardRef(() => NotificationsModule),
     TypeOrmModule.forFeature([User, Application, Ticket, TicketMessage]),
   ],
