@@ -4,6 +4,7 @@ import { IsArray, IsDate, IsNumber } from 'class-validator';
 
 interface ProductQty {
   id: number;
+  snapshotProductPrice: number;
   quantity: number;
 }
 

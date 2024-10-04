@@ -16,6 +16,9 @@ export class OrderDto {
   isHidden: boolean;
 
   @Expose()
+  snapshotTaxPercentage: number;
+
+  @Expose()
   discount: number;
 
   @Expose()

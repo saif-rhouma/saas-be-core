@@ -105,14 +105,29 @@ export class StockService {
     const { productToOrder } = order;
     for (const product of productToOrder) {
       const stock = await this.findOneByProduct(product.productId, appId);
-      if (operation === Operation.SUB) {
-        stock.quantity -= product.quantity;
-        order.subProductStock = true;
+      if (stock?.quantity !== undefined) {
+        if (operation === Operation.SUB) {
+          stock.quantity -= product.quantity;
+          order.subProductStock = true;
+        } else {
+          stock.quantity += product.quantity;
+          order.subProductStock = false;
+        }
+        await this.repo.save(stock);
       } else {
-        stock.quantity += product.quantity;
-        order.subProductStock = false;
+        const newStock = this.repo.create({ quantity: 0 });
+
+        newStock.product = product.product;
+
+        if (operation === Operation.SUB) {
+          newStock.quantity -= product.quantity;
+          order.subProductStock = true;
+        } else {
+          newStock.quantity += product.quantity;
+          order.subProductStock = false;
+        }
+        await this.repo.save(newStock);
       }
-      await this.repo.save(stock);
     }
 
     return order;

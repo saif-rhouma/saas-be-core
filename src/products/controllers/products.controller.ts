@@ -28,9 +28,11 @@ export class ProductsController {
     return this.productsService.remove(parseInt(id));
   }
 
+  @UseGuards(AuthenticationGuard)
   @Get('/:id')
-  async findProduct(@Param('id') id: string) {
-    const product = await this.productsService.findOne(parseInt(id));
+  async findProduct(@Param('id') id: string, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    const product = await this.productsService.findOneByApplication(parseInt(id), appId);
     if (!product) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
     }

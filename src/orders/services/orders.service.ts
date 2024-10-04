@@ -61,7 +61,7 @@ export class OrdersService {
     products.forEach((prod) => {
       const prd = orderData.products.find((prd) => prd.id === prod.id);
       if (prd) {
-        totalAmount += prod.price * prd.quantity;
+        totalAmount += prd.snapshotProductPrice * prd.quantity;
       }
     });
 
@@ -89,6 +89,7 @@ export class OrdersService {
     const orders = this.repo.find({
       where: { application: { id: appId } },
       relations: ['productToOrder', 'productToOrder.product', 'customer'],
+      order: { orderDate: 'ASC' },
     });
     if (!orders) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_ORDER);

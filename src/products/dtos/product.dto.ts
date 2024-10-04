@@ -6,6 +6,9 @@ export class ProductDto {
   name: string;
 
   @Expose()
+  description: string;
+
+  @Expose()
   price: number;
 
   @Expose()

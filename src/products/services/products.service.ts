@@ -7,6 +7,7 @@ import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { CreateProductDto } from '../dtos/create-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
 import { ApplicationsService } from 'src/applications/services/applications.service';
+import { OrderStatus } from 'src/orders/entities/order.entity';
 
 @Injectable()
 export class ProductService {
@@ -39,6 +40,7 @@ export class ProductService {
     }
     const product = await this.repo.findOne({
       where: { id, application: { id: appId } },
+      relations: { stock: true, productToOrder: { order: { customer: true } }, application: true },
     });
     if (!product) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
@@ -70,11 +72,24 @@ export class ProductService {
     return this.repo.remove(product);
   }
 
-  findAll(appId: number) {
-    return this.repo.find({
+  // findAll(appId: number) {
+  //   return this.repo.find({
+  //     where: { application: { id: appId } },
+  //     relations: { stock: true, productToOrder: { order: true }, application: true },
+  //   });
+  // }
+
+  async findAll(appId: number) {
+    const products = await this.repo.find({
       where: { application: { id: appId } },
-      relations: { stock: true, productToOrder: { order: true }, application: true },
+      relations: { stock: true, productToOrder: { order: { customer: true } }, application: true },
+      order: { productToOrder: { order: { orderDate: 'ASC' } } },
     });
+    products.forEach((prod) => {
+      const filtered = prod.productToOrder.filter((item) => item?.order?.status !== OrderStatus.Draft);
+      prod.productToOrder = filtered.slice(0, 6);
+    });
+    return products;
   }
 
   findAllStock(appId: number) {

@@ -21,6 +21,7 @@ export class ProductOrderService {
       productToOrder.orderId = order.id;
       productToOrder.productId = product.id;
       productToOrder.quantity = element.quantity;
+      productToOrder.snapshotProductPrice = element.snapshotProductPrice;
 
       const prodToOrder = this.repo.create(productToOrder);
       await this.repo.save(prodToOrder);
