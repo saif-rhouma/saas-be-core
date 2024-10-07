@@ -1,9 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { Controller, MessageEvent } from '@nestjs/common';
+import { Controller, Get, MessageEvent } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Subject } from 'rxjs';
 import { TicketsService } from 'src/tickets/services/tickets.service';
 import { NotificationsService } from '../services/notifications.service';
+import { MailerService } from '../services/mailer.service';
+import { SendEmailDto } from '../dtos/send-mail.dto';
+import { getHtmlString } from 'src/common/constants/mail-html-template';
 
 @Controller('notifications')
 export class NotificationsController {
@@ -16,7 +19,25 @@ export class NotificationsController {
     private eventEmitter: EventEmitter2,
     private readonly notificationsService: NotificationsService,
     private readonly ticketsService: TicketsService,
+    private readonly mailerService: MailerService,
   ) {}
+
+  @Get('mail')
+  async sendMailTest() {
+    const test: Partial<SendEmailDto> = {
+      from: {
+        name: 'Saas Test Mail',
+        address: 'test@saascore.com',
+      },
+      recipients: {
+        name: 'Saif',
+        address: 'saifeddine.rhouma.dev@gmail.com',
+      },
+      subject: 'test Mail from CORE',
+      html: getHtmlString('This is test', 'Testing 123!!'),
+    };
+    return this.mailerService.sendEmail(test);
+  }
 
   // @Sse('reminders')
   // async sse(

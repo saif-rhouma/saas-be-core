@@ -9,11 +9,12 @@ import { Customer } from './entities/customer.entity';
 import { UsersModule } from 'src/users/users.module';
 import { ApplicationsModule } from 'src/applications/applications.module';
 import { CustomerSubscriber } from './subscribers/customer.subscriber';
+import { Order } from 'src/orders/entities/order.entity';
 
 @Module({
   providers: [CustomersService, CustomerSubscriber],
   controllers: [CustomersController],
-  imports: [UsersModule, ApplicationsModule, TypeOrmModule.forFeature([Plan, User, Application, Customer])],
+  imports: [UsersModule, ApplicationsModule, TypeOrmModule.forFeature([Plan, User, Order, Application, Customer])],
   exports: [CustomersService],
 })
 export class CustomersModule {}

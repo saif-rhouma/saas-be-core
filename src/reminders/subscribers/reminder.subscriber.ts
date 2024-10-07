@@ -7,6 +7,9 @@ import { NotificationsGateway } from 'src/notifications/gateway/notifications.ga
 import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
 import { Reminder } from '../entities/reminder.entity';
 import { RemindersService } from '../services/reminders.service';
+import { MailerService } from 'src/notifications/services/mailer.service';
+import { getHtmlString } from 'src/common/constants/mail-html-template';
+import { SendEmailDto } from 'src/notifications/dtos/send-mail.dto';
 
 @EventSubscriber()
 export class ReminderSubscriber implements EntitySubscriberInterface<Reminder> {
@@ -16,6 +19,7 @@ export class ReminderSubscriber implements EntitySubscriberInterface<Reminder> {
     @Inject(DataSource) dataSource: DataSource,
     private readonly notificationGateway: NotificationsGateway,
     private readonly remindersService: RemindersService,
+    private readonly mailerService: MailerService,
   ) {
     dataSource.subscribers.push(this);
   }
@@ -55,6 +59,9 @@ export class ReminderSubscriber implements EntitySubscriberInterface<Reminder> {
         NotificationType.ALARM,
         reminder,
       );
+
+      await this.sendEmailToClient(reminder);
+
       await this.remindersService.isNotifiedChange(reminder.id, false);
       // After the job is done, stop and delete it
       this.jobs[reminder.id]?.stop();
@@ -88,5 +95,25 @@ export class ReminderSubscriber implements EntitySubscriberInterface<Reminder> {
   // Function to send the notification to a specific client
   sendNotificationToClient(clientId: string, message: string, type: NotificationType, data: any) {
     this.notificationGateway.handleNotificationMessage(clientId, { message, type, data });
+  }
+
+  async sendEmailToClient(reminder: Reminder) {
+    try {
+      const mail: Partial<SendEmailDto> = {
+        from: {
+          name: reminder.application.name,
+          address: 'test@saascore.com',
+        },
+        recipients: {
+          name: reminder.createdBy.firstName,
+          address: reminder.createdBy.email,
+        },
+        subject: reminder.title,
+        html: getHtmlString(reminder.title, reminder.description),
+      };
+      return this.mailerService.sendEmail(mail);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

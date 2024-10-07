@@ -21,6 +21,7 @@ export class CreateStaffDto {
   @IsString()
   role: string;
 
+  @IsOptional()
   @IsString()
   phoneNumber: string;
 

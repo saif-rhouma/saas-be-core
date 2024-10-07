@@ -7,11 +7,13 @@ import { UsersService } from 'src/users/services/users.service';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { ApplicationsService } from 'src/applications/services/applications.service';
 import { UpdateCustomerDto } from '../dtos/update-customer.dto';
+import { Order } from 'src/orders/entities/order.entity';
 
 @Injectable()
 export class CustomersService {
   constructor(
     @InjectRepository(Customer) private repo: Repository<Customer>,
+    @InjectRepository(Order) private repoOrder: Repository<Order>,
     private usersService: UsersService,
     private applicationsService: ApplicationsService,
   ) {}
@@ -48,8 +50,46 @@ export class CustomersService {
     return customer;
   }
 
-  findAllByApplication(appId: number) {
-    return this.repo.find({ where: { application: { id: appId } } });
+  async findOneByApplication(id: number, appId: number) {
+    if (!id || !appId) {
+      return null;
+    }
+    const customer = await this.repo.findOne({
+      where: { id, application: { id: appId } },
+    });
+    if (!customer) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_CUSTOMER);
+    }
+    const products = await this.topProductsByCustomer(id);
+    return { customer, products };
+  }
+
+  // findAllByApplication(appId: number) {
+  //   return this.repo.find({ where: { application: { id: appId } } });
+  // }
+
+  async findAllByApplication(appId: number) {
+    const customers = await this.repo.find({ where: { application: { id: appId } } });
+    // For each customer, fetch the last 5 orders
+    const customersWithOrders = await Promise.all(
+      customers.map(async (customer) => {
+        const LIMIT_ROW = 5;
+        const lastFiveOrders = await this.repoOrder.find({
+          where: { customer: { id: customer.id } },
+          order: { createTime: 'ASC' },
+          take: LIMIT_ROW,
+          relations: ['productToOrder', 'productToOrder.product'],
+        });
+
+        // Return the customer with an added property of their last 5 orders
+        return {
+          ...customer,
+          lastOrders: lastFiveOrders,
+        };
+      }),
+    );
+
+    return customersWithOrders;
   }
 
   findByName(name: string, appId: number) {
@@ -94,5 +134,18 @@ export class CustomersService {
       ORDER by total_orders DESC LIMIT ${LIMIT_ROW}`);
 
     return analytics;
+  }
+  async topProductsByCustomer(customerId: number) {
+    const products = await this.repo.manager.query(`
+      SELECT p.*, 
+      SUM(pto.quantity) AS total_quantity
+      FROM customer c
+      JOIN "order" o ON c.id = o.customerId
+      JOIN product_to_order pto ON o.id = pto.orderId
+      JOIN product p ON p.id = pto.productId
+      WHERE c.id = ${customerId}  
+      GROUP BY p.name
+      ORDER BY total_quantity DESC;`);
+    return products;
   }
 }

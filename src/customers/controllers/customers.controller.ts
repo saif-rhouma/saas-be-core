@@ -34,13 +34,12 @@ export class CustomersController {
     return customers;
   }
 
+  @UseGuards(AuthenticationGuard)
   @Get('/:id')
-  async findCustomer(@Param('id') id: string) {
-    const customer = await this.customersService.findOne(parseInt(id));
-    if (!customer) {
-      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_CUSTOMER);
-    }
-    return customer;
+  async findCustomer(@Param('id') id: string, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    const results = await this.customersService.findOneByApplication(parseInt(id), appId);
+    return results;
   }
 
   @UseGuards(AuthenticationGuard)

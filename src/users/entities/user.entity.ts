@@ -143,6 +143,11 @@ export class User {
   @OneToMany(() => RefreshToken, (token) => token.user)
   tokens: RefreshToken[];
 
+  @Column({
+    nullable: true,
+  })
+  lastLogin: Date;
+
   @CreateDateColumn()
   createTime: Date;
 

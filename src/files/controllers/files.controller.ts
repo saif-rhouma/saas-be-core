@@ -49,9 +49,21 @@ export class FilesController {
 
   @UseGuards(AuthenticationGuard)
   @Delete('/delete/:fileName')
-  async deleteProductsImages(@Param('fileName') fileName: string, @GetUser() user: Partial<User>) {
+  async deleteProductsImage(@Param('fileName') fileName: string, @GetUser() user: Partial<User>) {
     const appId = getApplicationId(user);
     return this.filesService.removeFileByName(fileName, user.id, appId);
+  }
+
+  @UseGuards(AuthenticationGuard)
+  @Delete('/deletes/')
+  async deleteProductsImages(@Body('files') files: any, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    if (files.length) {
+      for (const file of files) {
+        await this.filesService.removeFile(file, user.id, appId);
+      }
+    }
+    return 'OKAY';
   }
 
   @Get('/show/:fileName')

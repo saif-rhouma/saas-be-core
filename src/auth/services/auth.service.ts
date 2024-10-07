@@ -59,6 +59,7 @@ export class AuthService {
     const userToken = plainToInstance(UserTokenDto, userPlain, { excludeExtraneousValues: true });
     const { accessToken, refreshToken } = await this.generateUserTokens(userToken);
     await this.storeRefreshToken(refreshToken, user);
+    await this.usersService.updateLastLogin(user.id);
     return { ...user, accessToken, refreshToken };
   }
 

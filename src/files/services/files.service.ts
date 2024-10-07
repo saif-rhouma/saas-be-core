@@ -72,6 +72,27 @@ export class FilesService {
     }
   }
 
+  async removeFile(fileName: string, userId: number, applicationId: number) {
+    console.log('---> Remove');
+    try {
+      if (fileName && fileName.indexOf('.') !== -1) {
+        const isOwner = await this.findByName(fileName, userId, applicationId);
+        console.log('--> isOwner', isOwner);
+        if (isOwner.length) {
+          const filePath = join(process.cwd(), 'public', fileName);
+          if (existsSync(filePath)) {
+            unlinkSync(filePath);
+            await this.repo.remove(isOwner);
+          }
+        }
+      } else {
+        throw new Error();
+      }
+    } catch (error) {
+      console.log('eo', error);
+    }
+  }
+
   findByName(name: string, userId, appId: number) {
     return this.repo.find({ where: { name, application: { id: appId }, createdBy: { id: userId } } });
   }

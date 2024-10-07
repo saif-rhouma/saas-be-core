@@ -8,6 +8,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { RemindersModule } from 'src/reminders/reminders.module';
 import { TicketsModule } from 'src/tickets/tickets.module';
 import { NotificationsGateway } from './gateway/notifications.gateway';
+import { MailerService } from './services/mailer.service';
 @Module({
   controllers: [NotificationsController],
   imports: [
@@ -16,7 +17,7 @@ import { NotificationsGateway } from './gateway/notifications.gateway';
     forwardRef(() => RemindersModule),
     forwardRef(() => TicketsModule),
   ],
-  providers: [NotificationsService, NotificationsGateway],
-  exports: [NotificationsService, NotificationsGateway],
+  providers: [NotificationsService, NotificationsGateway, MailerService],
+  exports: [NotificationsService, NotificationsGateway, MailerService],
 })
 export class NotificationsModule {}

@@ -134,6 +134,20 @@ export class UsersService {
     return this.repo.save(user);
   }
 
+  async updateLastLogin(userId: number) {
+    if (!userId) {
+      return null;
+    }
+    const user = await this.findOne(userId);
+    if (!user) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER);
+    }
+
+    user.lastLogin = new Date();
+
+    return this.repo.save(user);
+  }
+
   findOne(id: number) {
     if (!id) {
       return null;
