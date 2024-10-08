@@ -45,6 +45,7 @@ import * as winston from 'winston';
 import { join } from 'path';
 import { SeedersModule } from './seeders/seeders.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { Category } from './products/entities/category.entity';
 
 @Module({
   imports: [
@@ -109,6 +110,7 @@ import { NotificationsModule } from './notifications/notifications.module';
             Reminder,
             ProductAddon,
             Financial,
+            Category,
           ],
         };
       },

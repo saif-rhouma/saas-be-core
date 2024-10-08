@@ -5,6 +5,7 @@ import { Financial } from 'src/financial/entities/financial-year.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { Plan } from 'src/plans/entities/plan.entity';
+import { Category } from 'src/products/entities/category.entity';
 import { ProductAddon } from 'src/products/entities/product-addon.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Reminder } from 'src/reminders/entities/reminder.entity';
@@ -107,6 +108,9 @@ export class Application {
 
   @OneToMany(() => Product, (product) => product.application)
   products: Product[];
+
+  @OneToMany(() => Category, (category) => category.application)
+  categories: Category[];
 
   @OneToMany(() => Product, (productAddon) => productAddon.application)
   productAddons: ProductAddon[];

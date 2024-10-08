@@ -9,11 +9,14 @@ import { Application } from 'src/applications/entities/application.entity';
 import { ProductAddonsService } from './services/product-addons.service';
 import { ProductAddonsController } from './controllers/product-addons.controller';
 import { ProductAddon } from './entities/product-addon.entity';
+import { Category } from './entities/category.entity';
+import { CategoriesService } from './services/categories.service';
+import { CategoriesController } from './controllers/categories.controller';
 
 @Module({
-  controllers: [ProductsController, ProductAddonsController],
-  providers: [ProductService, ProductAddonsService],
-  imports: [ApplicationsModule, TypeOrmModule.forFeature([Product, ProductAddon, Application])],
-  exports: [ProductService, ProductAddonsService],
+  controllers: [ProductsController, ProductAddonsController, CategoriesController],
+  providers: [ProductService, ProductAddonsService, CategoriesService],
+  imports: [ApplicationsModule, TypeOrmModule.forFeature([Product, ProductAddon, Application, Category])],
+  exports: [ProductService, ProductAddonsService, CategoriesService],
 })
 export class ProductsModule {}

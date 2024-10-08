@@ -32,6 +32,8 @@ export class UserDto {
             id: app?.id,
             name: app?.name,
             currencySymbol: app?.currencySymbol,
+            favicon: app?.favicon,
+            appLogo: app?.appLogo,
           };
         }),
       );
@@ -52,6 +54,8 @@ export class UserDto {
             id: app?.id,
             name: app?.name,
             currencySymbol: app?.currencySymbol,
+            favicon: app?.favicon,
+            appLogo: app?.appLogo,
           };
         }),
       );

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Product } from '../entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,12 +8,15 @@ import { CreateProductDto } from '../dtos/create-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
 import { ApplicationsService } from 'src/applications/services/applications.service';
 import { OrderStatus } from 'src/orders/entities/order.entity';
+import { CategoriesService } from './categories.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product) private repo: Repository<Product>,
     private applicationsService: ApplicationsService,
+    @Inject(forwardRef(() => CategoriesService))
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async create(productData: CreateProductDto, applicationId: number) {
@@ -21,7 +24,12 @@ export class ProductService {
     if (!application) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_APPLICATION);
     }
+
     const product = this.repo.create(productData);
+    if (productData.categoryId != null) {
+      const category = await this.categoriesService.findOneByApplication(productData.categoryId, applicationId);
+      product.category = category;
+    }
     product.application = application;
     return this.repo.save(product);
   }
@@ -40,7 +48,7 @@ export class ProductService {
     }
     const product = await this.repo.findOne({
       where: { id, application: { id: appId } },
-      relations: { stock: true, productToOrder: { order: { customer: true } }, application: true },
+      relations: { stock: true, productToOrder: { order: { customer: true } }, application: true, category: true },
     });
     if (!product) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
@@ -64,8 +72,27 @@ export class ProductService {
     return this.repo.find({ where: { name, application: { id: appId } } });
   }
 
-  async remove(id: number) {
-    const product = await this.findOne(id);
+  async findAndRemoveCategory(categoryId: number) {
+    const products = await this.repo.find({ where: { category: { id: categoryId } } });
+    for (const product of products) {
+      product.category = null; // Break the relation
+      await this.repo.save(product); // Save the updated orders
+    }
+  }
+
+  // async remove(id: number) {
+  //   const product = await this.findOne(id);
+  //   if (!product) {
+  //     throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
+  //   }
+  //   return this.repo.remove(product);
+  // }
+
+  async remove(id: number, appId: number) {
+    if (!id || !appId) {
+      return null;
+    }
+    const product = await this.findOneByApplication(id, appId);
     if (!product) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
     }
@@ -82,7 +109,7 @@ export class ProductService {
   async findAll(appId: number) {
     const products = await this.repo.find({
       where: { application: { id: appId } },
-      relations: { stock: true, productToOrder: { order: { customer: true } }, application: true },
+      relations: { stock: true, productToOrder: { order: { customer: true } }, application: true, category: true },
       order: { productToOrder: { order: { orderDate: 'ASC' } } },
     });
     products.forEach((prod) => {
@@ -96,12 +123,16 @@ export class ProductService {
     return this.repo.find({ where: { application: { id: appId } }, relations: { stock: true } });
   }
 
-  async update(id: number, prod: UpdateProductDto) {
-    const product = await this.findOne(id);
+  async update(id: number, appId: number, prod: UpdateProductDto) {
+    const product = await this.findOneByApplication(id, appId);
     if (!product) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PRODUCT);
     }
     Object.assign(product, prod);
+    if (prod.categoryId != null && prod.categoryId !== product?.category?.id) {
+      const category = await this.categoriesService.findOneByApplication(prod.categoryId, appId);
+      product.category = category;
+    }
     return this.repo.save(product);
   }
 

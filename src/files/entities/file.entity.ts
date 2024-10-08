@@ -14,6 +14,7 @@ export enum FileCategory {
   Payment = 'Payment',
   Ticket = 'Ticket',
   Reminder = 'Reminder',
+  Category = 'Category',
   AppAvatar = 'AppAvatar',
   AppLogo = 'AppLogo',
   Avatar = 'Avatar',

@@ -5,6 +5,7 @@ import { Plan } from 'src/plans/entities/plan.entity';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { Supplying } from 'src/stock/entities/supplying.entity';
 import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Category } from './category.entity';
 
 @Entity()
 export class Product {
@@ -32,6 +33,9 @@ export class Product {
 
   @ManyToOne(() => Application, (application) => application.products)
   application: Application;
+
+  @ManyToOne(() => Category, (category) => category.products, { nullable: true })
+  category: Category;
 
   @OneToMany(() => Plan, (plan) => plan.product)
   plans: Plan[];

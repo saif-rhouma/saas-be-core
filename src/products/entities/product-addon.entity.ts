@@ -1,10 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Application } from 'src/applications/entities/application.entity';
-import { ProductToOrder } from 'src/orders/entities/product_order.entity';
-import { Plan } from 'src/plans/entities/plan.entity';
-import { Stock } from 'src/stock/entities/stock.entity';
-import { Supplying } from 'src/stock/entities/supplying.entity';
-import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class ProductAddon {

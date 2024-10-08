@@ -23,9 +23,11 @@ export class ProductsController {
     return this.productsService.create(productData, appId);
   }
 
+  @UseGuards(AuthenticationGuard)
   @Delete('/:id')
-  async removeProduct(@Param('id') id: string) {
-    return this.productsService.remove(parseInt(id));
+  async removeProduct(@Param('id') id: string, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    return this.productsService.remove(parseInt(id), appId);
   }
 
   @UseGuards(AuthenticationGuard)
@@ -46,8 +48,14 @@ export class ProductsController {
     return this.productsService.findAll(appId);
   }
 
+  @UseGuards(AuthenticationGuard)
   @Patch('/:id')
-  async updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(parseInt(id), updateProductDto);
+  async updateProduct(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @GetUser() user: Partial<User>,
+  ) {
+    const appId = getApplicationId(user);
+    return this.productsService.update(parseInt(id), appId, updateProductDto);
   }
 }
