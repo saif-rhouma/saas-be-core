@@ -25,6 +25,7 @@ import { TicketMessage } from 'src/tickets/entities/ticket-message.entity';
 import { Reminder } from 'src/reminders/entities/reminder.entity';
 import { File } from 'src/files/entities/file.entity';
 import { Financial } from 'src/financial/entities/financial-year.entity';
+import { PermissionsGroup } from './permissions-group.entity';
 
 export enum AccountType {
   Free = 'Free',
@@ -139,6 +140,10 @@ export class User {
 
   @ManyToMany(() => Permission, (permission) => permission.users)
   permissions: Permission[];
+
+  @ManyToMany(() => PermissionsGroup, (pg) => pg.staffs, { cascade: true })
+  @JoinTable()
+  groups: PermissionsGroup[];
 
   @OneToMany(() => RefreshToken, (token) => token.user)
   tokens: RefreshToken[];

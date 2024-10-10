@@ -42,7 +42,7 @@ export class CategoriesService {
     }
     const category = await this.repo.findOne({
       where: { id, application: { id: appId } },
-      relations: { application: true },
+      relations: { application: true, products: true },
     });
     if (!category) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_CATEGORY);

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Inject, Logger } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Inject, Logger } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { Logger as WinstonLogger } from 'winston';
 
@@ -12,13 +12,12 @@ class AllExceptionsFilter implements ExceptionFilter {
     @Inject('winston') private readonly winstonLogger: WinstonLogger,
   ) {}
 
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: HttpException, host: ArgumentsHost) {
     const { httpAdapter } = this.httpAdapterHost;
     const ctx = host.switchToHttp();
-    const httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const status = exception instanceof Error ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.BAD_REQUEST;
-    const message = exception instanceof Error ? exception.message : 'Unknown error occurred';
+    const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    const message = exception instanceof HttpException ? exception.message : 'Unknown error occurred';
 
     this.logger.error(`Exception :${message}, stack ${exception.stack}`);
     this.winstonLogger.error(`Exception :${message}, stack ${exception.stack}`);
@@ -31,8 +30,8 @@ class AllExceptionsFilter implements ExceptionFilter {
       method: request.method,
     });
 
-    const responseBody = { status: httpStatus, message: 'Internal Server Error' };
-    httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
+    const responseBody = { status: status, message };
+    httpAdapter.reply(ctx.getResponse(), responseBody, status);
   }
 }
 

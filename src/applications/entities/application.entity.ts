@@ -10,6 +10,7 @@ import { ProductAddon } from 'src/products/entities/product-addon.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Reminder } from 'src/reminders/entities/reminder.entity';
 import { Ticket } from 'src/tickets/entities/ticket.entity';
+import { PermissionsGroup } from 'src/users/entities/permissions-group.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -138,6 +139,9 @@ export class Application {
 
   @OneToMany(() => Financial, (financial) => financial.application)
   financialYears: Financial[];
+
+  @OneToMany(() => PermissionsGroup, (pg) => pg.application)
+  groups: PermissionsGroup[];
 
   @CreateDateColumn()
   createTime: Date;

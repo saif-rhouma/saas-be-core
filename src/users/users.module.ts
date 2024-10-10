@@ -13,13 +13,16 @@ import { PermissionsService } from './services/permissions.service';
 import { PermissionsController } from './controllers/permissions.controller';
 import { Application } from 'src/applications/entities/application.entity';
 import { ApplicationsModule } from 'src/applications/applications.module';
+import { PermissionsGroup } from './entities/permissions-group.entity';
+import { PermissionsGroupService } from './services/permissions-group.service';
+import { PermissionsGroupController } from './controllers/permissions-group.controller';
 
 @Module({
-  controllers: [UsersController, RolesController, PermissionsController],
-  providers: [UsersService, RolesService, PermissionsService],
+  controllers: [UsersController, RolesController, PermissionsController, PermissionsGroupController],
+  providers: [UsersService, RolesService, PermissionsService, PermissionsGroupService],
   imports: [
     forwardRef(() => ApplicationsModule),
-    TypeOrmModule.forFeature([User, RefreshToken, Role, Permission, Application]),
+    TypeOrmModule.forFeature([User, RefreshToken, Role, Permission, PermissionsGroup, Application]),
   ],
   exports: [UsersService, RolesService, PermissionsService],
 })

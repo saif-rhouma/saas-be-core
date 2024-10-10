@@ -12,6 +12,7 @@ import { RoleType } from 'src/common/constants/roles';
 import { ApplicationsService } from 'src/applications/services/applications.service';
 import { CreateStaffDto } from 'src/auth/dtos/create-staff.dto';
 import { UpdateStaffDto } from '../dtos/update-staff.dto';
+import { PermissionsGroupService } from './permissions-group.service';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +22,8 @@ export class UsersService {
     private permissionsService: PermissionsService,
     @Inject(forwardRef(() => ApplicationsService))
     private applicationsService: ApplicationsService,
+    @Inject(forwardRef(() => PermissionsGroupService))
+    private permissionsGroupService: PermissionsGroupService,
   ) {}
 
   createSimpleUser(email: string, password: string) {
@@ -79,15 +82,36 @@ export class UsersService {
       user.applications = [application];
     }
 
-    for (const permissionSlug of staffData.permissions) {
-      const [permission] = await this.permissionsService.findBySlug(permissionSlug);
-      if (!permission) {
-        throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PERMISSION);
+    if (staffData.permissions) {
+      for (const permissionSlug of staffData.permissions) {
+        const [permission] = await this.permissionsService.findBySlug(permissionSlug);
+        if (!permission) {
+          throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PERMISSION);
+        }
+        if (user.permissions) {
+          user.permissions.push(permission);
+        } else {
+          user.permissions = [permission];
+        }
       }
-      if (user.permissions) {
-        user.permissions.push(permission);
-      } else {
-        user.permissions = [permission];
+    }
+
+    if (staffData.permissionsGroup != null || staffData.permissionsGroup !== 0) {
+      user.permissions = [];
+      const permissionsGroup = await this.permissionsGroupService.findOneByApplication(
+        staffData.permissionsGroup,
+        applicationId,
+      );
+
+      user.groups = [permissionsGroup];
+
+      for (const perm of permissionsGroup.permissions) {
+        const permission = await this.permissionsService.findOne(perm.id);
+        if (user.permissions) {
+          user.permissions.push(permission);
+        } else {
+          user.permissions = [permission];
+        }
       }
     }
 
@@ -162,7 +186,7 @@ export class UsersService {
     }
     const staff = await this.repo.findOne({
       where: { id, applications: { id: appId }, roles: { name: RoleType.STAFF } },
-      relations: ['permissions'],
+      relations: ['permissions', 'groups'],
     });
     if (!staff) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);

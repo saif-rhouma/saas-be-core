@@ -108,6 +108,7 @@ export class UsersController {
     if (!staff) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);
     }
+    console.log('---> staff', staff);
     return staff;
   }
 

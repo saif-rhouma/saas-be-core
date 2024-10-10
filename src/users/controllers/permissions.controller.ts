@@ -1,13 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { Body, Controller, Delete, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
-import { PermissionsService } from '../services/permissions.service';
-import { CreatePermissionDto } from '../dtos/create-permission.dto';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
-import { AuthenticationGuard } from 'src/common/guards/authentication.guard';
 import { GetUser } from 'src/common/decorators/getUser.decorator';
+import { AuthenticationGuard } from 'src/common/guards/authentication.guard';
+import { CreatePermissionDto } from '../dtos/create-permission.dto';
 import { User } from '../entities/user.entity';
-import { RoleType } from 'src/common/constants/roles';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { PermissionsService } from '../services/permissions.service';
 
 @Controller('permissions')
 export class PermissionsController {

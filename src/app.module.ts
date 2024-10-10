@@ -46,6 +46,7 @@ import { join } from 'path';
 import { SeedersModule } from './seeders/seeders.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { Category } from './products/entities/category.entity';
+import { PermissionsGroup } from './users/entities/permissions-group.entity';
 
 @Module({
   imports: [
@@ -111,6 +112,7 @@ import { Category } from './products/entities/category.entity';
             ProductAddon,
             Financial,
             Category,
+            PermissionsGroup,
           ],
         };
       },
