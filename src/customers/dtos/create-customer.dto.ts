@@ -14,7 +14,7 @@ export class CreateCustomerDto {
   @IsNotEmpty()
   isActive: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   phoneNumber: string;
 
