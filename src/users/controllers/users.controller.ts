@@ -60,8 +60,9 @@ export class UsersController {
 
   @UseGuards(AuthenticationGuard)
   @Patch('staff/:id')
-  async updateStaffAccount(@Param('id') id: string, @Body() userData: UpdateStaffDto) {
-    const res = await this.usersService.updateStaff(parseInt(id), userData);
+  async updateStaffAccount(@Param('id') id: string, @Body() userData: UpdateStaffDto, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    const res = await this.usersService.updateStaff(parseInt(id), appId, userData);
     return res;
   }
 
@@ -108,7 +109,6 @@ export class UsersController {
     if (!staff) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);
     }
-    console.log('---> staff', staff);
     return staff;
   }
 

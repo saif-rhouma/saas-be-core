@@ -13,6 +13,7 @@ import { ApplicationsService } from 'src/applications/services/applications.serv
 import { CreateStaffDto } from 'src/auth/dtos/create-staff.dto';
 import { UpdateStaffDto } from '../dtos/update-staff.dto';
 import { PermissionsGroupService } from './permissions-group.service';
+import { PermissionsGroup } from '../entities/permissions-group.entity';
 
 @Injectable()
 export class UsersService {
@@ -95,8 +96,7 @@ export class UsersService {
         }
       }
     }
-
-    if (staffData.permissionsGroup != null || staffData.permissionsGroup !== 0) {
+    if (staffData.permissionsGroup && staffData.permissionsGroup !== 0) {
       user.permissions = [];
       const permissionsGroup = await this.permissionsGroupService.findOneByApplication(
         staffData.permissionsGroup,
@@ -113,6 +113,8 @@ export class UsersService {
           user.permissions = [permission];
         }
       }
+    } else {
+      user.groups = [];
     }
 
     return this.repo.save(user);
@@ -194,6 +196,14 @@ export class UsersService {
     return staff;
   }
 
+  async getUserPermissionsGroup(userId: number, appId: number) {
+    const user = await this.findOneByApplication(userId, appId);
+    if (user.groups) {
+      return user.groups[0];
+    }
+    return null;
+  }
+
   find(email: string) {
     return this.repo.find({ where: { email }, relations: { roles: true, userOwnedApps: true, applications: true } });
   }
@@ -225,7 +235,7 @@ export class UsersService {
     return this.repo.save(user);
   }
 
-  async updateStaff(id: number, attrs: Partial<UpdateStaffDto>) {
+  async updateStaff(id: number, appId: number, attrs: Partial<UpdateStaffDto>) {
     const user = await this.findOne(id);
     if (!user) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);
@@ -250,7 +260,50 @@ export class UsersService {
         }
       }
     }
+
+    if (attrs.permissionsGroup && attrs.permissionsGroup !== 0) {
+      user.permissions = [];
+      const permissionsGroup = await this.permissionsGroupService.findOneByApplication(attrs.permissionsGroup, appId);
+
+      user.groups = [permissionsGroup];
+
+      for (const perm of permissionsGroup.permissions) {
+        const permission = await this.permissionsService.findOne(perm.id);
+        if (user.permissions) {
+          user.permissions.push(permission);
+        } else {
+          user.permissions = [permission];
+        }
+      }
+    } else {
+      user.groups = [];
+    }
+
     return this.repo.save(user);
+  }
+
+  async removeAllPermissionAndPG(userId: number, appId: number) {
+    const user = await this.findOneByApplication(userId, appId);
+    if (!user) {
+      throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER_STAFF);
+    }
+    user.groups = [];
+    user.permissions = [];
+    return this.repo.save(user);
+  }
+
+  async updateStaffPermissionFromPG(pg: PermissionsGroup) {
+    for (const staff of pg.staffs) {
+      staff.permissions = [];
+      for (const permission of pg.permissions) {
+        if (staff.permissions) {
+          staff.permissions.push(permission);
+        } else {
+          staff.permissions = [permission];
+        }
+      }
+      await this.repo.save(staff);
+    }
   }
 
   async upgradeUser(id: number, accountType: AccountType) {

@@ -5,6 +5,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -40,6 +41,9 @@ export class Ticket {
 
   @ManyToOne(() => User, (user) => user.members)
   member: User;
+
+  @ManyToMany(() => User, (user) => user.mentionedIn, { cascade: true, onDelete: null })
+  mentions: User[];
 
   @Column('text', { default: Priority.Medium })
   priority: Priority;

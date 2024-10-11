@@ -33,7 +33,8 @@ export class TicketsController {
   @Get()
   async findAll(@GetUser() user: Partial<User>) {
     const appId = getApplicationId(user);
-    const tickets = await this.ticketsService.findAllByApplication(appId);
+    const tickets = await this.ticketsService.findAllByApplicationAndUser(user.id, appId);
+    // const tickets = await this.ticketsService.findAllByApplication(appId);
     if (!tickets) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_TICKET);
     }

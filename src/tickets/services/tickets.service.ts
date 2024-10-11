@@ -31,8 +31,15 @@ export class TicketsService {
     if (!user) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_USER);
     }
+    let mentions;
+
+    if (ticketData.mentions && ticketData.mentions?.length) {
+      mentions = [...ticketData.mentions];
+      delete ticketData.mentions;
+    }
 
     const member = await this.usersService.findOne(ticketData.memberId);
+
     const preTicket = new Ticket();
 
     preTicket.member = member;
@@ -45,6 +52,13 @@ export class TicketsService {
 
     const ticket = this.repo.create({ ...preTicket });
 
+    if (mentions) {
+      ticket.mentions = [];
+      for (const item of mentions) {
+        const user = await this.usersService.findOne(item.id);
+        ticket.mentions.push(user);
+      }
+    }
     return this.repo.save(ticket);
   }
 
@@ -60,6 +74,46 @@ export class TicketsService {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_TICKET);
     }
     return ticket;
+  }
+
+  async findAllByApplicationAndUser(userId: number, appId: number) {
+    if (!appId) {
+      return null;
+    }
+
+    const tickets = await this.repo.manager.query(`
+      SELECT T.*, JSON_OBJECT(
+        'id', M.id,
+        'email', M.email,
+        'firstName', M.firstName,
+        'lastName', M.lastName,
+        'phoneNumber', M.phoneNumber,
+        'avatar', M.avatar,
+        'address', M.address
+    ) AS member,
+      -- CreatedBy details
+    JSON_OBJECT(
+        'id', C.id,
+        'email', C.email,
+        'firstName', C.firstName,
+        'lastName', C.lastName,
+        'phoneNumber', C.phoneNumber,
+        'accountType', C.accountType,
+        'avatar', C.avatar,
+        'address', C.address
+    ) AS createdBy
+      FROM ticket T
+      LEFT JOIN application A ON T.applicationId = A.id        
+      LEFT JOIN user C ON T.createdById = C.id                   
+      LEFT JOIN user M ON T.memberId = M.id                  
+      LEFT JOIN user_mentioned_in_ticket TM ON T.id = TM.ticketId 
+      LEFT JOIN user U ON TM.userId = U.id             
+      WHERE A.id = ${appId}                               
+        AND (C.id = ${userId}                                    
+             OR M.id = ${userId}                               
+             OR U.id = ${userId})
+      GROUP BY T.id;`);
+    return tickets;
   }
 
   async getNotificationTickets(appId: number, userId: number) {
@@ -80,7 +134,7 @@ export class TicketsService {
     }
     const ticket = await this.repo.findOne({
       where: { id, application: { id: appId } },
-      relations: { member: true, messages: { createdBy: true }, createdBy: true },
+      relations: { member: true, messages: { createdBy: true }, createdBy: true, mentions: true },
     });
     if (!ticket) {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_TICKET);

@@ -8,6 +8,7 @@ import { PermissionsGroup } from '../entities/permissions-group.entity';
 import { CreatePermissionsGroupDto } from '../dtos/create-permissions-group.dto';
 import { PermissionsService } from './permissions.service';
 import { UpdatePermissionsGroupDto } from '../dtos/update-permissions-group.dto';
+import { UsersService } from './users.service';
 
 @Injectable()
 export class PermissionsGroupService {
@@ -16,6 +17,8 @@ export class PermissionsGroupService {
     @Inject(forwardRef(() => ApplicationsService))
     private applicationsService: ApplicationsService,
     private permissionsService: PermissionsService,
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
   ) {}
 
   async create(pgData: CreatePermissionsGroupDto, applicationId: number) {
@@ -109,6 +112,8 @@ export class PermissionsGroupService {
       pg.permissions.push(permission);
     }
 
+    // ** Update Users Permissions Here!
+    await this.usersService.updateStaffPermissionFromPG(pg);
     return this.repo.save(pg);
   }
 }

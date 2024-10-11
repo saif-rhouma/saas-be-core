@@ -13,7 +13,7 @@ export class MailerService {
     const transporter = nodemailer.createTransport({
       host: this.config.get<string>('MAIL_HOST'),
       port: parseInt(this.config.get<string>('MAIL_PORT')),
-      secure: false, // true for port 465, false for other ports
+      secure: true, // true for port 465, false for other ports
       auth: {
         user: this.config.get<string>('MAIL_USER'),
         pass: this.config.get<string>('MAIL_PASSWORD'),
@@ -35,7 +35,6 @@ export class MailerService {
       subject,
       html,
     };
-
     try {
       const res = await transporter.sendMail(options);
       return res;

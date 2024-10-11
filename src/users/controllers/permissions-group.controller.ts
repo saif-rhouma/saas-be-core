@@ -8,10 +8,14 @@ import { User } from '../entities/user.entity';
 import getApplicationId from 'src/common/helpers/application-id.func';
 import { MSG_EXCEPTION } from 'src/common/constants/messages';
 import { UpdatePermissionsGroupDto } from '../dtos/update-permissions-group.dto';
+import { UsersService } from '../services/users.service';
 
 @Controller('permissions-group')
 export class PermissionsGroupController {
-  constructor(private permissionsGroupService: PermissionsGroupService) {}
+  constructor(
+    private permissionsGroupService: PermissionsGroupService,
+    private usersService: UsersService,
+  ) {}
 
   @UseGuards(AuthenticationGuard)
   @Post('/create')
@@ -29,6 +33,15 @@ export class PermissionsGroupController {
       throw new NotFoundException(MSG_EXCEPTION.NOT_FOUND_PERMISSION_GROUP);
     }
     return pgs;
+  }
+
+  @UseGuards(AuthenticationGuard)
+  @Delete('/user/:id')
+  async deleteUserFromPermissionsGroup(@Param('id') id: string, @GetUser() user: Partial<User>) {
+    const appId = getApplicationId(user);
+    const group = await this.usersService.getUserPermissionsGroup(parseInt(id), appId);
+    await this.usersService.removeAllPermissionAndPG(parseInt(id), appId);
+    return this.permissionsGroupService.findOneByApplication(group.id, appId);
   }
 
   @UseGuards(AuthenticationGuard)

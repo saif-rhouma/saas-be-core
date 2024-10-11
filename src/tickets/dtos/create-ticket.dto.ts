@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Priority } from '../entities/ticket.entity';
 
 export class CreateTicketDto {
@@ -14,4 +14,8 @@ export class CreateTicketDto {
   @IsString()
   @IsOptional()
   file: string;
+
+  @IsArray()
+  @IsOptional()
+  mentions: any;
 }

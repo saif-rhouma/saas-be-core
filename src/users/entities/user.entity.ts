@@ -145,6 +145,10 @@ export class User {
   @JoinTable()
   groups: PermissionsGroup[];
 
+  @ManyToMany(() => Ticket, (ticket) => ticket.mentions)
+  @JoinTable()
+  mentionedIn: Ticket[];
+
   @OneToMany(() => RefreshToken, (token) => token.user)
   tokens: RefreshToken[];
 
